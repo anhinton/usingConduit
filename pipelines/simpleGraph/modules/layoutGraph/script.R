@@ -1,0 +1,5 @@
+setwd("/home/ahin017/files.fos/openapi/usingConduit/pipelines/simpleGraph/modules/layoutGraph")
+myGraph <- readRDS("/home/ahin017/files.fos/openapi/usingConduit/pipelines/simpleGraph/modules/createGraph/directedGraph.rds")
+library(Rgraphviz)
+Ragraph <- agopen(myGraph, "myGraph")
+saveRDS(Ragraph, file="Ragraph.rds")

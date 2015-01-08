@@ -1,0 +1,9 @@
+# files I might produce that are not for the website
+*.pdf
+*.html
+*.tar.gz
+
+# knitr and rmarkdown cache directories
+cache/
+*_cache/
+*_files/
