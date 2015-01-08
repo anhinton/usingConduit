@@ -20,7 +20,7 @@ machine. It requires the following R packages: 'XML', 'graph', 'RBGL',
 conduit directly from github. The 'Rgraphviz' and 'gridGraphviz'
 packages are required to run the modules in this example.
 
-Version 0.1 of the packages, built 2014-12-15, is [available for
+Version 0.1 of the packages, built 2015-02-08, is [available for
 download](conduit_0.1-0.tar.gz).
 
 Source code for conduit is available at
