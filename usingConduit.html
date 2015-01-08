@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Ashley Noel Hinton" />
+  <title>Guide to using conduit</title>
+  <style type="text/css">
+    div.main { margin: auto; max-width: 800px; }
+    code{ white-space: pre-wrap; }
+  </style>
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+  </style>
+</head>
+<body>
+<div class="main">
+<div id="header">
+<h1 class="title">Guide to using conduit</h1>
+<h2 class="author">Ashley Noel Hinton</h2>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#quick-start-running-a-pipeline">Quick start: running a pipeline</a><ul>
+<li><a href="#installing-conduit">Installing conduit</a></li>
+<li><a href="#reading-a-pipeline-from-an-xml-file">Reading a pipeline from an XML file</a></li>
+<li><a href="#run-a-pipeline-in-conduit">Run a pipeline in conduit</a></li>
+</ul></li>
+<li><a href="#searching-for-files-in-conduit">Searching for files in conduit</a></li>
+<li><a href="#modules">modules</a><ul>
+<li><a href="#loading-modules-from-xml">Loading modules from XML</a></li>
+<li><a href="#creating-modules">Creating modules</a></li>
+<li><a href="#executing-module-scripts">Executing module scripts</a></li>
+<li><a href="#saving-modules-as-xml-files">Saving modules as XML files</a></li>
+</ul></li>
+<li><a href="#pipelines">pipelines</a><ul>
+<li><a href="#loading-pipelines-from-xml">Loading pipelines from XML</a></li>
+<li><a href="#creating-pipelines">Creating pipelines</a></li>
+<li><a href="#executing-pipeline-components">Executing pipeline components</a></li>
+<li><a href="#saving-and-exporting-pipelines-as-xml-files">Saving and exporting pipelines as XML files</a></li>
+</ul></li>
+<li><a href="#case-study-turning-r-scripts-into-modules-and-a-pipeline">Case study: turning R scripts into modules and a pipeline</a></li>
+<li><a href="#case-study-turning-something-non-r-into-a-modulepipeline">Case study: turning something non-R into a module/pipeline</a></li>
+</ul>
+</div>
+<h2 id="quick-start-running-a-pipeline">Quick start: running a pipeline</h2>
+<h3 id="installing-conduit">Installing conduit</h3>
+<p>conduit is an R package built using R version 3.1.x on a 64-bit Linux machine. It requires the following R packages: 'XML', 'graph', 'RBGL', 'RCurl', and 'tools'. The 'devtools' package is required to install conduit directly from github. The 'Rgraphviz' and 'gridGraphviz' packages are required to run the modules in this example.</p>
+<p>Version 0.1 of the packages, built 2014-12-15, is <a href="conduit_0.1-0.tar.gz">available for download</a>.</p>
+<p>Source code for conduit is available at <a href="https://github.com/anhinton/conduit" class="uri">https://github.com/anhinton/conduit</a> for those who would like to build and install the package manually.</p>
+<p>To install conduit using 'devtools':</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;devtools&quot;</span>)
+devtools::<span class="kw">install_github</span>(<span class="st">&quot;anhinton/conduit&quot;</span>)</code></pre>
+<p>Load the conduit package:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(conduit)</code></pre>
+<h3 id="reading-a-pipeline-from-an-xml-file">Reading a pipeline from an XML file</h3>
+<p>The <code>loadPipeline()</code> function is used to read a pipeline XML file into conduit. <code>loadPipeline()</code> requires a <code>name</code> argument, and a <code>ref</code> argument which describes the XML file location The function returns a <code>pipeline</code> object.</p>
+<p>We will load our the pipeline used in out pipelines example above. The pipeline XML file is in a sub-directory of the R working directory called 'simpleGraph'.</p>
+<pre class="sourceCode r"><code class="sourceCode r">## load the simpleGraph pipeline
+simpleGraph &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">loadPipeline</span>(<span class="dt">name =</span> <span class="st">&quot;simpleGraph&quot;</span>, <span class="dt">ref=</span><span class="st">&quot;simpleGraph/pipeline.xml&quot;</span>)</code></pre>
+<p>According to its <code>description</code>:</p>
+<pre><code>This pipeline creates a directed graphNEL graph, lays it out using the Rgraphviz package, and then plots the graph as a PNG file using the gridGraphviz package</code></pre>
+<h3 id="run-a-pipeline-in-conduit">Run a pipeline in conduit</h3>
+<p>The <code>runPipeline()</code> function is used to run a <code>pipeline</code> object in R. It requires a <code>pipeline</code> object as its only argument. This function will create a directory for the pipeline in the 'pipelines' sub-directory of the current working directory. If a 'pipelines' sub-directory does not exist it will be created. Each module in the pipeline will create output in a named directory found in ./pipelines/PIPELINE_NAME/modules.</p>
+<pre class="sourceCode r"><code class="sourceCode r">## run the simpleGraph pipeline
+<span class="kw">runPipeline</span>(simpleGraph)</code></pre>
+<p>This creates the following files:</p>
+<ol style="list-style-type: decimal">
+<li><a href="pipelines/simpleGraph/modules/createGraph/directedGraph.rds" class="uri">pipelines/simpleGraph/modules/createGraph/directedGraph.rds</a></li>
+<li><a href="pipelines/simpleGraph/modules/createGraph/script.R" class="uri">pipelines/simpleGraph/modules/createGraph/script.R</a></li>
+<li><a href="pipelines/simpleGraph/modules/layoutGraph/Ragraph.rds" class="uri">pipelines/simpleGraph/modules/layoutGraph/Ragraph.rds</a></li>
+<li><a href="pipelines/simpleGraph/modules/layoutGraph/script.R" class="uri">pipelines/simpleGraph/modules/layoutGraph/script.R</a></li>
+<li><a href="pipelines/simpleGraph/modules/plotGraph/example.png" class="uri">pipelines/simpleGraph/modules/plotGraph/example.png</a></li>
+<li><a href="pipelines/simpleGraph/modules/plotGraph/script.R" class="uri">pipelines/simpleGraph/modules/plotGraph/script.R</a></li>
+</ol>
+<p>File number 5, <a href="pipelines/simpleGraph/modules/plotGraph/example.png" class="uri">pipelines/simpleGraph/modules/plotGraph/example.png</a> is the output file we require, the PNG image of the graph. The image is shown below:</p>
+<div class="figure">
+<img src="pipelines/simpleGraph/modules/plotGraph/example.png" alt="Pipeline output: PNG image file of graph" /><p class="caption">Pipeline output: PNG image file of graph</p>
+</div>
+<h2 id="searching-for-files-in-conduit">Searching for files in conduit</h2>
+<p>conduit allows the user to either specify the location of a resource file, or to provide a filename and file location(s) where the file should be found. Functions which have <code>ref</code> and <code>path</code> arguments provide the option to search for a resource.</p>
+<p>If the value of <code>ref</code> is an absolute resource address, e.g. a full file path, then no further searching will be done. Relative file paths can also be provided to <code>ref</code> arguments.</p>
+<p>If no resource can be sensibly found at <code>ref</code>, a search is started. Conduit will search by default in the directory for the module or pipeline which initiated the search, then R's current working directory. The default search paths can be amended or replaced by the <code>path</code> argument. Search paths are given as character strings, with each path divided by the '|' character. Values for <code>path</code> which end in '|' will be prepended to the default search paths, and those which beging with '|' will be appended.</p>
+<p>conduit will search in each search path provided until a matching file is located. The first match will be returned.</p>
+<p>The following example will attemp to load a module by searching for a file named in <code>ref</code> in the paths listed in <code>path</code>, and then the default search paths.</p>
+<pre class="sourceCode r"><code class="sourceCode r">mod1 &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="dt">name =</span> <span class="st">&quot;loader&quot;</span>, <span class="dt">ref =</span> <span class="st">&quot;arrangeLines.xml&quot;</span>,
+                   <span class="dt">path =</span> <span class="st">&quot;~/openapi|/media/ashley/floppyDisk|&quot;</span>)</code></pre>
+<h2 id="modules">modules</h2>
+<p>This sections describes how to: load modules from XML files; create modules in R using conduit; execute module source scripts; save modules as module XML files.</p>
+<h3 id="loading-modules-from-xml">Loading modules from XML</h3>
+<h4 id="loadmodule"><code>loadModule()</code></h4>
+<p>This function reads and interprets a module XML file, producing a <code>module</code> object in R. It requires the following arguments:</p>
+<ul>
+<li><code>name</code>: module name (must be unique within a pipeline)</li>
+<li><code>ref</code>: Filename or file path of xml file.
+<ul>
+<li><code>path</code>: optional search path(s) for <code>ref</code> resource</li>
+</ul></li>
+</ul>
+<p><code>loadModule()</code> also accepts a <code>namespaces</code> argument, which should be a named character vector of namespaces used in the module XML file. The default value for <code>namespaces</code> is <code>c(oa = &quot;http://www.openapi.org/2014/&quot;))</code>.</p>
+<p>Example:</p>
+<pre class="sourceCode r"><code class="sourceCode r">plotGraphXML &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;plotGraph.xml&quot;</span>)
+plotGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="dt">name =</span> <span class="st">&quot;plotGraph&quot;</span>,
+                        <span class="dt">ref =</span> plotGraphXML)</code></pre>
+<h3 id="creating-modules">Creating modules</h3>
+<p>Modules can be created in conduit using the <code>module()</code> function and its associated helper functions. The resulting modules can be executed in conduit, or exported to disk as module XML files.</p>
+<p>The following example shows how a module can be created.</p>
+<pre class="sourceCode r"><code class="sourceCode r">## create input, output, and source lists
+inputsList &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">list</span>(<span class="kw">moduleInput</span>(<span class="st">&quot;myGraph&quot;</span>, <span class="st">&quot;internal&quot;</span>, <span class="st">&quot;R </span><span class="ch">\&quot;</span><span class="st">graphNEL</span><span class="ch">\&quot;</span><span class="st"> object&quot;</span>))
+outputsList &lt;-
+<span class="st">    </span><span class="kw">list</span>(<span class="kw">moduleOutput</span>(<span class="st">&quot;Ragraph&quot;</span>, <span class="st">&quot;internal&quot;</span>, <span class="st">&quot;R </span><span class="ch">\&quot;</span><span class="st">Ragraph</span><span class="ch">\&quot;</span><span class="st"> object&quot;</span>))
+sourcesList &lt;-
+<span class="st">    </span><span class="kw">list</span>(<span class="kw">moduleSource</span>(<span class="dt">value =</span> <span class="kw">c</span>(<span class="st">&quot;library(Rgraphviz)&quot;</span>, 
+                                <span class="st">&quot;Ragraph &lt;- agopen(myGraph, </span><span class="ch">\&quot;</span><span class="st">myGraph</span><span class="ch">\&quot;</span><span class="st">)&quot;</span>)))
+## create module
+layoutGraph &lt;-<span class="st"> </span><span class="kw">module</span>(<span class="dt">name =</span> <span class="st">&quot;layoutGraph&quot;</span>, <span class="dt">platform =</span> <span class="st">&quot;R&quot;</span>,
+                      <span class="dt">description =</span> <span class="st">&quot;Lays out a graphNEL graph using the Rgraphviz package&quot;</span>,
+                      <span class="dt">inputs =</span> inputsList,
+                      <span class="dt">outputs =</span> outputsList,
+                      <span class="dt">sources =</span> sourcesList)</code></pre>
+<h4 id="module"><code>module()</code></h4>
+<p>The <code>module()</code> function is used to create module objects.</p>
+<p>Required aruments:</p>
+<ul>
+<li><code>name</code>: module name (must be unique within a pipeline)</li>
+<li><code>platform</code>: name of platform required to execute module source</li>
+</ul>
+<p>Optional arguments:</p>
+<ul>
+<li><code>description</code>: a brief description of what the module does</li>
+<li><code>inputs</code>: a list of <a href="#moduleinput"><code>moduleInput</code></a> objects</li>
+<li><code>outputs</code>: a list of <a href="#moduleoutput"><code>moduleOutput</code></a> objects</li>
+<li><code>sources</code>: a list of <a href="#modulesource"><code>moduleSource</code></a> objects</li>
+<li><code>path</code>: search path to be used by module's source(s)</li>
+</ul>
+<p>Examples:</p>
+<pre class="sourceCode r"><code class="sourceCode r">mod1 &lt;-<span class="st"> </span><span class="kw">module</span>(<span class="dt">name =</span> <span class="st">&quot;cleanCSV&quot;</span>, <span class="dt">platform =</span> <span class="st">&quot;R&quot;</span>,
+               <span class="dt">description =</span> <span class="st">&quot;clean up the data in a CSV file&quot;</span>,
+               <span class="dt">inputs =</span> inputsList1, <span class="dt">outputs =</span> outputsList1,
+               <span class="dt">sources =</span> sourcesList1)</code></pre>
+<h4 id="moduleinput"><code>moduleInput()</code></h4>
+<p>The <code>moduleInput()</code> function is used to create the inputs for modules created in R with the <code>module()</code> function. Each input should correspond to an object of the same name in the module's source(s). It requires the following arguments:</p>
+<ul>
+<li><code>name</code>: input name (must be unique within a module)</li>
+<li><code>type</code>: &quot;internal&quot; or &quot;external&quot;</li>
+</ul>
+<p>Optional arguments:</p>
+<ul>
+<li><code>format</code>: format of input for validation, e.g. &quot;R data frame&quot;</li>
+<li><code>formatType</code>: type of object given to be used for validation. Defaults to &quot;text&quot; to perform text-matching of <code>format</code>s.</li>
+</ul>
+<p>Examples:</p>
+<pre class="sourceCode r"><code class="sourceCode r">inp1 &lt;-<span class="st"> </span><span class="kw">moduleInput</span>(<span class="dt">name =</span> <span class="st">&quot;pollingBooths&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;internal&quot;</span>,
+                    <span class="dt">format =</span> <span class="st">&quot;R data frame&quot;</span>)
+inp2 &lt;-<span class="st"> </span><span class="kw">moduleInput</span>(<span class="dt">name =</span> <span class="st">&quot;boothLatLong&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;external&quot;</span>, 
+                    <span class="dt">format =</span> <span class="st">&quot;CSV file&quot;</span>, <span class="dt">formatType =</span> <span class="st">&quot;text&quot;</span>)</code></pre>
+<h4 id="moduleoutput"><code>moduleOutput()</code></h4>
+<p>The <code>moduleOutput()</code> function is used to create the outputs for modules created in R with the <code>module()</code> function. Each &quot;internal&quot; output should correspond to an object of the same name in the module's source(s). &quot;external&quot; outputs are not produced by conduit, but are produced directly by the module source script(s). It is recommended that an &quot;external&quot; output have the same <code>name</code> and <code>ref</code>, though this is not compulsory. <code>moduleOutput()</code> requires the following arguments:</p>
+<ul>
+<li><code>name</code>: output name (must be unique within a module)</li>
+<li><code>type</code>: &quot;internal&quot; or &quot;external&quot;
+<ul>
+<li><code>ref</code>: if the output <code>type</code> is &quot;external&quot; a <code>ref</code> must be provided. This provides the file location of the external output produced by the module source(s). This should be either a filename if the source(s) produce the file in the working direcory, or the full resource location of the external file. Relative file paths should not be used.</li>
+</ul></li>
+</ul>
+<p>Optional arguments:</p>
+<ul>
+<li><code>format</code>: format of input for validation, e.g. &quot;R data frame&quot;</li>
+<li><code>formatType</code>: type of object given to be used for validation. Defaults to &quot;text&quot; to perform text-matching of <code>format</code>s.</li>
+</ul>
+<p>Examples:</p>
+<pre class="sourceCode r"><code class="sourceCode r">outp1 &lt;-<span class="st"> </span><span class="kw">moduleOutput</span>(<span class="dt">name =</span> <span class="st">&quot;pollingBooths&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;internal&quot;</span>,
+                      <span class="dt">format =</span> <span class="st">&quot;R data frame&quot;</span>)
+outp2 &lt;-<span class="st"> </span><span class="kw">moduleOutput</span>(<span class="dt">name =</span> <span class="st">&quot;boothCoords.csv&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;external&quot;</span>, 
+                      <span class="dt">format =</span> <span class="st">&quot;CSV file&quot;</span>, <span class="dt">ref =</span> <span class="st">&quot;boothCoords.csv&quot;</span>)</code></pre>
+<h4 id="modulesource"><code>moduleSource()</code></h4>
+<p>The <code>moduleSource()</code> function creates source objects. These objects contain the scripts which are to be executed using a module's platform.</p>
+<p>A source script can either be provided inline as a character vector, or as a reference to a script file.</p>
+<p>Arguments:</p>
+<ul>
+<li><code>value</code>: a character vector containing the script to be executed. If <code>value</code> argument is empty, and a <code>ref</code> is provided, script will be read from the resource provided in <code>ref</code>.</li>
+<li><code>ref</code>: Filename or file location of a text script file.
+<ul>
+<li><code>path</code>: optional search path(s) for <code>ref</code> resource</li>
+</ul></li>
+<li><code>type</code>: not used as at 2015-01-07.</li>
+<li><code>order</code>: numeric value specifying the position of execution of this source in the module's sources. Module sources are executed in the following order:
+<ol style="list-style-type: decimal">
+<li>negative numbers in ascending order</li>
+<li>0 (zero)</li>
+<li>no order specified</li>
+<li>positive numbers in ascending order</li>
+</ol></li>
+</ul>
+<p>Examples:</p>
+<pre class="sourceCode r"><code class="sourceCode r">script1 &lt;-<span class="st"> &quot;pollingPlaces &lt;- read.csv(file = csv_input)&quot;</span>
+source1 &lt;-<span class="st"> </span><span class="kw">moduleSource</span>(<span class="dt">value =</span> script1)
+source2 &lt;-<span class="st"> </span><span class="kw">moduleSource</span>(<span class="dt">ref =</span> <span class="st">&quot;plotting.R&quot;</span>, <span class="dt">path =</span> <span class="st">&quot;~/handyScripts&quot;</span>, 
+                        <span class="dt">order =</span> <span class="st">&quot;-1&quot;</span>)</code></pre>
+<h3 id="executing-module-scripts">Executing module scripts</h3>
+<h4 id="runmodule"><code>runModule()</code></h4>
+<p>Module source scripts are executed using the <code>runModule()</code> function. The function makes the module's inputs available to the source script(s) in the designated platform, and executes the source script(s). The module's outputs are saved to a directory called <code>modules</code>, in a subdirectory with the module's name. This function requires the following arguments:</p>
+<ul>
+<li><code>module</code>: a module object, usually from <code>module()</code> or <code>loadModule()</code></li>
+<li><code>inputs</code>: a named list of absolute locations of module's inputs</li>
+<li><code>targetDirectory</code>: file path for <code>modules</code> output directory</li>
+</ul>
+<p>Examples:</p>
+<pre class="sourceCode r"><code class="sourceCode r">## run a module with no inputs
+createGraphXML &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;createGraph.xml&quot;</span>)
+createGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="dt">name =</span> <span class="st">&quot;createGraph&quot;</span>, <span class="dt">ref =</span> createGraphXML)
+<span class="kw">runModule</span>(<span class="dt">module =</span> createGraph, <span class="dt">targetDirectory =</span> <span class="kw">getwd</span>())</code></pre>
+<p>The module's output can be found in <a href="modules/createGraph" class="uri">modules/createGraph</a>:</p>
+<ul>
+<li><a href="modules/createGraph/directedGraph.rds">directedGraph.rds</a></li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">## run a module with an input
+layoutGraphXML &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;layoutGraph.xml&quot;</span>)
+layoutGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="st">&quot;layoutGraph&quot;</span>, layoutGraphXML)
+## this module uses the output from the previous module as input
+myGraph &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="st">&quot;modules&quot;</span>, <span class="st">&quot;createGraph&quot;</span>, <span class="st">&quot;directedGraph.rds&quot;</span>)
+<span class="kw">runModule</span>(<span class="dt">module =</span> layoutGraph,
+          <span class="dt">inputs =</span> <span class="kw">c</span>(<span class="dt">myGraph =</span> <span class="kw">normalizePath</span>(myGraph)))</code></pre>
+<h3 id="saving-modules-as-xml-files">Saving modules as XML files</h3>
+<h4 id="savemodule"><code>saveModule()</code></h4>
+<p>This function saves a module to disk as a module XML file.</p>
+<h2 id="pipelines">pipelines</h2>
+<h3 id="loading-pipelines-from-xml">Loading pipelines from XML</h3>
+<h4 id="loadpipeline"><code>loadPipeline()</code></h4>
+<h3 id="creating-pipelines">Creating pipelines</h3>
+<h4 id="pipeline"><code>pipeline()</code></h4>
+<h4 id="addcomponent"><code>addComponent()</code></h4>
+<h4 id="pipe"><code>pipe()</code></h4>
+<h4 id="addpipe"><code>addPipe()</code></h4>
+<h3 id="executing-pipeline-components">Executing pipeline components</h3>
+<h4 id="runpipeline"><code>runPipeline()</code></h4>
+<h4 id="runcomponent"><code>runComponent()</code></h4>
+<h3 id="saving-and-exporting-pipelines-as-xml-files">Saving and exporting pipelines as XML files</h3>
+<h4 id="savepipeline"><code>savePipeline()</code></h4>
+<h4 id="exportpipeline"><code>exportPipeline()</code></h4>
+<h2 id="case-study-turning-r-scripts-into-modules-and-a-pipeline">Case study: turning R scripts into modules and a pipeline</h2>
+<h2 id="case-study-turning-something-non-r-into-a-modulepipeline">Case study: turning something non-R into a module/pipeline</h2>
+</div>
+</body>
+</html>
