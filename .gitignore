@@ -1,6 +1,5 @@
 # files I might produce that are not for the website
 *.pdf
-*.tar.gz
 
 # knitr and rmarkdown cache directories
 cache/
