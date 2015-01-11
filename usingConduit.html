@@ -308,7 +308,6 @@ layoutGraph$name</code></pre>
 <h4 id="pipeline"><code>pipeline()</code></h4>
 <p>The <code>pipeline</code> function requires a <code>name</code> argument. The following arguments can also be provided:</p>
 <ul>
-<li><code>path</code>: (Optional) Search path(s) for components associated with this pipeline.</li>
 <li><code>description</code>: A text description of what the pipeline does.</li>
 <li><code>components</code>: a list of the pipelines components. These must be <code>module</code> or <code>pipeline</code> objects (or both). If this argument is empty the pipeline's components will be taken from the following arguments:
 <ul>
@@ -317,6 +316,7 @@ layoutGraph$name</code></pre>
 </ul></li>
 <li><code>pipes</code>: a list of <code>pipe</code> objects.</li>
 </ul>
+<p>It is also possible to set the search path(s) for a pipeline using the <code>path</code> argument. This can be used to set search path(s) for a module's components for which no path is provided.</p>
 <p>Example:</p>
 <pre class="sourceCode r"><code class="sourceCode r">createGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="st">&quot;createGraph&quot;</span>, 
                           <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;createGraph.xml&quot;</span>))

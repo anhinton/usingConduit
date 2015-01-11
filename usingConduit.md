@@ -445,8 +445,6 @@ executed using conduit, or saved to disk as XML files.
 The `pipeline` function requires a `name` argument. The following arguments
 can also be provided:
 
-  + `path`: (Optional) Search path(s) for components associated with this
-    pipeline.
   + `description`: A text description of what the pipeline does.
   + `components`: a list of the pipelines components. These must be 
     `module` or `pipeline` objects (or both). If this argument is empty the
@@ -454,6 +452,10 @@ can also be provided:
      - `modules`: a list of `module` objects.
      - `pipelines`: a list of `pipeline` objects.
   + `pipes`: a list of `pipe` objects.
+
+It is also possible to set the search path(s) for a pipeline using the
+`path` argument. This can be used to set search path(s) for a module's
+components for which no path is provided.
 
 Example:
 
