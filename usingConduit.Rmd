@@ -169,7 +169,7 @@ plotGraph <- loadModule(name = "plotGraph",
 
 Modules can be created in conduit using the `module()` function and
 its associated helper functions. The resulting modules can be executed
-in conduit, or exported to disk as module XML files.
+in conduit, or saved to disk as module XML files.
 
 The following example shows how a module can be created.
 
@@ -416,7 +416,39 @@ simpleGraph <- loadPipeline(name = "simpleGraph",
 
 ### Creating pipelines
 
+Pipelines can be created using the `pipeline()` function, and its
+associated helper functions. The resulting `pipeline` objects can be
+executed using conduit, or saved to disk as XML files.
+
 #### `pipeline()`
+
+The `pipeline` function requires a `name` argument. The following arguments
+can also be provided:
+
+  + `path`: (Optional) Search path(s) for components associated with this
+    pipeline.
+  + `description`: A text description of what the pipeline does.
+  + `components`: a list of the pipelines components. These must be 
+    `module` or `pipeline` objects (or both). If this argument is empty the
+    pipeline's components will be taken from the following arguments:
+     - `modules`: a list of `module` objects.
+     - `pipelines`: a list of `pipeline` objects.
+  + `pipes`: a list of `pipe` objects.
+
+Example:
+
+```{r pipelineExample}
+createGraph <- loadModule("createGraph", 
+                          file.path("simpleGraph", "createGraph.xml"))
+layoutGraph <- loadModule("layoutGraph",
+                          file.path("simpleGraph", "layoutGraph.xml"))
+pipe1 <- pipe("createGraph", "directedGraph", "layoutGraph", "myGraph")
+pipelineExample <- 
+    pipeline(name = "example", 
+             components = list(createGraph, layoutGraph),
+             pipes = list(pipe1))
+```
+
 #### `addComponent()`
 #### `pipe()`
 #### `addPipe()`

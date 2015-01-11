@@ -145,7 +145,7 @@ simpleGraph &lt;-<span class="st"> </span>
 plotGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="dt">name =</span> <span class="st">&quot;plotGraph&quot;</span>,
                         <span class="dt">ref =</span> plotGraphXML)</code></pre>
 <h3 id="creating-modules">Creating modules</h3>
-<p>Modules can be created in conduit using the <code>module()</code> function and its associated helper functions. The resulting modules can be executed in conduit, or exported to disk as module XML files.</p>
+<p>Modules can be created in conduit using the <code>module()</code> function and its associated helper functions. The resulting modules can be executed in conduit, or saved to disk as module XML files.</p>
 <p>The following example shows how a module can be created.</p>
 <pre class="sourceCode r"><code class="sourceCode r">## create input, output, and source lists
 inputsList &lt;-<span class="st"> </span>
@@ -304,7 +304,29 @@ layoutGraph$name</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span><span class="kw">loadPipeline</span>(<span class="dt">name =</span> <span class="st">&quot;simpleGraph&quot;</span>,
                             <span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>))</code></pre>
 <h3 id="creating-pipelines">Creating pipelines</h3>
+<p>Pipelines can be created using the <code>pipeline()</code> function, and its associated helper functions. The resulting <code>pipeline</code> objects can be executed using conduit, or saved to disk as XML files.</p>
 <h4 id="pipeline"><code>pipeline()</code></h4>
+<p>The <code>pipeline</code> function requires a <code>name</code> argument. The following arguments can also be provided:</p>
+<ul>
+<li><code>path</code>: (Optional) Search path(s) for components associated with this pipeline.</li>
+<li><code>description</code>: A text description of what the pipeline does.</li>
+<li><code>components</code>: a list of the pipelines components. These must be <code>module</code> or <code>pipeline</code> objects (or both). If this argument is empty the pipeline's components will be taken from the following arguments:
+<ul>
+<li><code>modules</code>: a list of <code>module</code> objects.</li>
+<li><code>pipelines</code>: a list of <code>pipeline</code> objects.</li>
+</ul></li>
+<li><code>pipes</code>: a list of <code>pipe</code> objects.</li>
+</ul>
+<p>Example:</p>
+<pre class="sourceCode r"><code class="sourceCode r">createGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="st">&quot;createGraph&quot;</span>, 
+                          <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;createGraph.xml&quot;</span>))
+layoutGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="st">&quot;layoutGraph&quot;</span>,
+                          <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;layoutGraph.xml&quot;</span>))
+pipe1 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="st">&quot;createGraph&quot;</span>, <span class="st">&quot;directedGraph&quot;</span>, <span class="st">&quot;layoutGraph&quot;</span>, <span class="st">&quot;myGraph&quot;</span>)
+pipelineExample &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">pipeline</span>(<span class="dt">name =</span> <span class="st">&quot;example&quot;</span>, 
+             <span class="dt">components =</span> <span class="kw">list</span>(createGraph, layoutGraph),
+             <span class="dt">pipes =</span> <span class="kw">list</span>(pipe1))</code></pre>
 <h4 id="addcomponent"><code>addComponent()</code></h4>
 <h4 id="pipe"><code>pipe()</code></h4>
 <h4 id="addpipe"><code>addPipe()</code></h4>
