@@ -133,8 +133,8 @@ modules
 -------
 
 This sections describes how to: load modules from XML files; create
-modules in R using conduit; execute module source scripts; save
-modules as module XML files.
+modules; execute module source scripts; save modules as module XML
+files.
 
 ### Loading modules from XML
 
@@ -403,9 +403,36 @@ saveModule(module = layoutGraph, targetDirectory = tempTarget)
 pipelines
 ---------
 
+This sections describes how to: load pipelines from XML files; create
+pipelines ; execute pipeline components; save pipelines and their
+components as XML files.
+
 ### Loading pipelines from XML
 
 #### `loadPipeline()`
+
+This function reads and interprets a pipeline XML file, producing a
+`pipeline` object in R. The function will also read and interpret
+module and pipeline XML provided in the XML's file `<component>`
+nodes. The resulting objects will be loaded into the `components` slot
+of the parent `pipeline` object. `loadPipeline()` requires the
+following arguments:
+
+  + `name`: pipeline name
+  + `ref`: Filename or file path of XML file.
+     - `path`: optional search path(s) for `ref` resource
+
+`loadPipeline()` also accepts a `namespaces` argument, which should be a named
+character vector of namespaces used in the pipeline XML file. The default
+value for `namespaces` is `c(oa = "http://www.openapi.org/2014/"))`.
+
+Example:
+
+
+```r
+simpleGraph <- loadPipeline(name = "simpleGraph",
+                            ref = file.path("simpleGraph", "pipeline.xml"))
+```
 
 ### Creating pipelines
 
@@ -423,6 +450,7 @@ pipelines
 
 #### `savePipeline()`
 #### `exportPipeline()`
+
 
 Case study: turning R scripts into modules and a pipeline
 ----------

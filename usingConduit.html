@@ -45,16 +45,40 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </ul></li>
 <li><a href="#searching-for-files-in-conduit">Searching for files in conduit</a></li>
 <li><a href="#modules">modules</a><ul>
-<li><a href="#loading-modules-from-xml">Loading modules from XML</a></li>
-<li><a href="#creating-modules">Creating modules</a></li>
-<li><a href="#executing-module-scripts">Executing module scripts</a></li>
-<li><a href="#saving-modules-as-xml-files">Saving modules as XML files</a></li>
+<li><a href="#loading-modules-from-xml">Loading modules from XML</a><ul>
+<li><a href="#loadmodule"><code>loadModule()</code></a></li>
+</ul></li>
+<li><a href="#creating-modules">Creating modules</a><ul>
+<li><a href="#module"><code>module()</code></a></li>
+<li><a href="#moduleinput"><code>moduleInput()</code></a></li>
+<li><a href="#moduleoutput"><code>moduleOutput()</code></a></li>
+<li><a href="#modulesource"><code>moduleSource()</code></a></li>
+</ul></li>
+<li><a href="#executing-module-scripts">Executing module scripts</a><ul>
+<li><a href="#runmodule"><code>runModule()</code></a></li>
+</ul></li>
+<li><a href="#saving-modules-as-xml-files">Saving modules as XML files</a><ul>
+<li><a href="#savemodule"><code>saveModule()</code></a></li>
+</ul></li>
 </ul></li>
 <li><a href="#pipelines">pipelines</a><ul>
-<li><a href="#loading-pipelines-from-xml">Loading pipelines from XML</a></li>
-<li><a href="#creating-pipelines">Creating pipelines</a></li>
-<li><a href="#executing-pipeline-components">Executing pipeline components</a></li>
-<li><a href="#saving-and-exporting-pipelines-as-xml-files">Saving and exporting pipelines as XML files</a></li>
+<li><a href="#loading-pipelines-from-xml">Loading pipelines from XML</a><ul>
+<li><a href="#loadpipeline"><code>loadPipeline()</code></a></li>
+</ul></li>
+<li><a href="#creating-pipelines">Creating pipelines</a><ul>
+<li><a href="#pipeline"><code>pipeline()</code></a></li>
+<li><a href="#addcomponent"><code>addComponent()</code></a></li>
+<li><a href="#pipe"><code>pipe()</code></a></li>
+<li><a href="#addpipe"><code>addPipe()</code></a></li>
+</ul></li>
+<li><a href="#executing-pipeline-components">Executing pipeline components</a><ul>
+<li><a href="#runpipeline"><code>runPipeline()</code></a></li>
+<li><a href="#runcomponent"><code>runComponent()</code></a></li>
+</ul></li>
+<li><a href="#saving-and-exporting-pipelines-as-xml-files">Saving and exporting pipelines as XML files</a><ul>
+<li><a href="#savepipeline"><code>savePipeline()</code></a></li>
+<li><a href="#exportpipeline"><code>exportPipeline()</code></a></li>
+</ul></li>
 </ul></li>
 <li><a href="#case-study-turning-r-scripts-into-modules-and-a-pipeline">Case study: turning R scripts into modules and a pipeline</a></li>
 <li><a href="#case-study-turning-something-non-r-into-a-modulepipeline">Case study: turning something non-R into a module/pipeline</a></li>
@@ -104,7 +128,7 @@ simpleGraph &lt;-<span class="st"> </span>
 <pre class="sourceCode r"><code class="sourceCode r">mod1 &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="dt">name =</span> <span class="st">&quot;loader&quot;</span>, <span class="dt">ref =</span> <span class="st">&quot;arrangeLines.xml&quot;</span>,
                    <span class="dt">path =</span> <span class="st">&quot;~/openapi|/media/ashley/floppyDisk|&quot;</span>)</code></pre>
 <h2 id="modules">modules</h2>
-<p>This sections describes how to: load modules from XML files; create modules in R using conduit; execute module source scripts; save modules as module XML files.</p>
+<p>This sections describes how to: load modules from XML files; create modules; execute module source scripts; save modules as module XML files.</p>
 <h3 id="loading-modules-from-xml">Loading modules from XML</h3>
 <h4 id="loadmodule"><code>loadModule()</code></h4>
 <p>This function reads and interprets a module XML file, producing a <code>module</code> object in R. It requires the following arguments:</p>
@@ -264,8 +288,21 @@ layoutGraph$name</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">saveModule</span>(<span class="dt">module =</span> layoutGraph, <span class="dt">targetDirectory =</span> tempTarget)</code></pre>
 <pre><code>## [1] &quot;/tmp/RtmpFVYWeb/layoutGraph.xml&quot;</code></pre>
 <h2 id="pipelines">pipelines</h2>
+<p>This sections describes how to: load pipelines from XML files; create pipelines ; execute pipeline components; save pipelines and their components as XML files.</p>
 <h3 id="loading-pipelines-from-xml">Loading pipelines from XML</h3>
 <h4 id="loadpipeline"><code>loadPipeline()</code></h4>
+<p>This function reads and interprets a pipeline XML file, producing a <code>pipeline</code> object in R. The function will also read and interpret module and pipeline XML provided in the XML's file <code>&lt;component&gt;</code> nodes. The resulting objects will be loaded into the <code>components</code> slot of the parent <code>pipeline</code> object. <code>loadPipeline()</code> requires the following arguments:</p>
+<ul>
+<li><code>name</code>: pipeline name</li>
+<li><code>ref</code>: Filename or file path of XML file.
+<ul>
+<li><code>path</code>: optional search path(s) for <code>ref</code> resource</li>
+</ul></li>
+</ul>
+<p><code>loadPipeline()</code> also accepts a <code>namespaces</code> argument, which should be a named character vector of namespaces used in the pipeline XML file. The default value for <code>namespaces</code> is <code>c(oa = &quot;http://www.openapi.org/2014/&quot;))</code>.</p>
+<p>Example:</p>
+<pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span><span class="kw">loadPipeline</span>(<span class="dt">name =</span> <span class="st">&quot;simpleGraph&quot;</span>,
+                            <span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>))</code></pre>
 <h3 id="creating-pipelines">Creating pipelines</h3>
 <h4 id="pipeline"><code>pipeline()</code></h4>
 <h4 id="addcomponent"><code>addComponent()</code></h4>
