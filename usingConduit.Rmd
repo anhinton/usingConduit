@@ -348,7 +348,38 @@ runModule(module = layoutGraph,
 
 #### `saveModule()`
 
-This function saves a module to disk as a module XML file.
+This function saves a module to disk as a module XML file. This
+function requires a `module` object be passed to the `module`
+argument. The function also accepts the following optional arguments:
+
+  + `targetDirectory`: location to save XML file. This defaults to the
+    current working directory.
+  + `filename`: name of resulting XML file. If not specified the file will
+    be given the `module` name with '.xml' appended.
+
+The full path of the resulting file is returned.
+
+Examples:
+
+Specify the filename for the new module XML file:
+
+```{r saveModuleExample1}
+createGraph <- loadModule("createGraph", 
+                          file.path("simpleGraph", "createGraph.xml"))
+tempTarget <- tempdir()
+saveModule(module = createGraph, targetDirectory = tempTarget,
+           filename = "newCreateGraph.xml")
+```
+
+Save a module to XML without specifiying the filename:
+
+```{r saveModuleExample2}
+layoutGraph <- loadModule("layoutGraph", 
+                          file.path("simpleGraph", "layoutGraph.xml"))
+layoutGraph$name
+saveModule(module = layoutGraph, targetDirectory = tempTarget)
+```
+
 
 pipelines
 ---------

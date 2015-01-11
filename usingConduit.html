@@ -63,7 +63,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <h2 id="quick-start-running-a-pipeline">Quick start: running a pipeline</h2>
 <h3 id="installing-conduit">Installing conduit</h3>
 <p>conduit is an R package built using R version 3.1.x on a 64-bit Linux machine. It requires the following R packages: 'XML', 'graph', 'RBGL', 'RCurl', and 'tools'. The 'devtools' package is required to install conduit directly from github. The 'Rgraphviz' and 'gridGraphviz' packages are required to run the modules in this example.</p>
-<p>Version 0.1 of the packages, built 2014-12-15, is <a href="conduit_0.1-0.tar.gz">available for download</a>.</p>
+<p>Version 0.1 of the packages, built 2015-02-08, is <a href="conduit_0.1-0.tar.gz">available for download</a>.</p>
 <p>Source code for conduit is available at <a href="https://github.com/anhinton/conduit" class="uri">https://github.com/anhinton/conduit</a> for those who would like to build and install the package manually.</p>
 <p>To install conduit using 'devtools':</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;devtools&quot;</span>)
@@ -242,7 +242,27 @@ myGraph &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span cl
           <span class="dt">inputs =</span> <span class="kw">c</span>(<span class="dt">myGraph =</span> <span class="kw">normalizePath</span>(myGraph)))</code></pre>
 <h3 id="saving-modules-as-xml-files">Saving modules as XML files</h3>
 <h4 id="savemodule"><code>saveModule()</code></h4>
-<p>This function saves a module to disk as a module XML file.</p>
+<p>This function saves a module to disk as a module XML file. This function requires a <code>module</code> object be passed to the <code>module</code> argument. The function also accepts the following optional arguments:</p>
+<ul>
+<li><code>targetDirectory</code>: location to save XML file. This defaults to the current working directory.</li>
+<li><code>filename</code>: name of resulting XML file. If not specified the file will be given the <code>module</code> name with '.xml' appended.</li>
+</ul>
+<p>The full path of the resulting file is returned.</p>
+<p>Examples:</p>
+<p>Specify the filename for the new module XML file:</p>
+<pre class="sourceCode r"><code class="sourceCode r">createGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="st">&quot;createGraph&quot;</span>, 
+                          <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;createGraph.xml&quot;</span>))
+tempTarget &lt;-<span class="st"> </span><span class="kw">tempdir</span>()
+<span class="kw">saveModule</span>(<span class="dt">module =</span> createGraph, <span class="dt">targetDirectory =</span> tempTarget,
+           <span class="dt">filename =</span> <span class="st">&quot;newCreateGraph.xml&quot;</span>)</code></pre>
+<pre><code>## [1] &quot;/tmp/RtmpFVYWeb/newCreateGraph.xml&quot;</code></pre>
+<p>Save a module to XML without specifiying the filename:</p>
+<pre class="sourceCode r"><code class="sourceCode r">layoutGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="st">&quot;layoutGraph&quot;</span>, 
+                          <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;layoutGraph.xml&quot;</span>))
+layoutGraph$name</code></pre>
+<pre><code>## [1] &quot;layoutGraph&quot;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">saveModule</span>(<span class="dt">module =</span> layoutGraph, <span class="dt">targetDirectory =</span> tempTarget)</code></pre>
+<pre><code>## [1] &quot;/tmp/RtmpFVYWeb/layoutGraph.xml&quot;</code></pre>
 <h2 id="pipelines">pipelines</h2>
 <h3 id="loading-pipelines-from-xml">Loading pipelines from XML</h3>
 <h4 id="loadpipeline"><code>loadPipeline()</code></h4>

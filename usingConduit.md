@@ -16,7 +16,7 @@ machine. It requires the following R packages: 'XML', 'graph', 'RBGL',
 conduit directly from github. The 'Rgraphviz' and 'gridGraphviz'
 packages are required to run the modules in this example.
 
-Version 0.1 of the packages, built 2014-12-15, is [available for
+Version 0.1 of the packages, built 2015-02-08, is [available for
 download](conduit_0.1-0.tar.gz).
 
 Source code for conduit is available at
@@ -350,7 +350,55 @@ runModule(module = layoutGraph,
 
 #### `saveModule()`
 
-This function saves a module to disk as a module XML file.
+This function saves a module to disk as a module XML file. This
+function requires a `module` object be passed to the `module`
+argument. The function also accepts the following optional arguments:
+
+  + `targetDirectory`: location to save XML file. This defaults to the
+    current working directory.
+  + `filename`: name of resulting XML file. If not specified the file will
+    be given the `module` name with '.xml' appended.
+
+The full path of the resulting file is returned.
+
+Examples:
+
+Specify the filename for the new module XML file:
+
+
+```r
+createGraph <- loadModule("createGraph", 
+                          file.path("simpleGraph", "createGraph.xml"))
+tempTarget <- tempdir()
+saveModule(module = createGraph, targetDirectory = tempTarget,
+           filename = "newCreateGraph.xml")
+```
+
+```
+## [1] "/tmp/RtmpFVYWeb/newCreateGraph.xml"
+```
+
+Save a module to XML without specifiying the filename:
+
+
+```r
+layoutGraph <- loadModule("layoutGraph", 
+                          file.path("simpleGraph", "layoutGraph.xml"))
+layoutGraph$name
+```
+
+```
+## [1] "layoutGraph"
+```
+
+```r
+saveModule(module = layoutGraph, targetDirectory = tempTarget)
+```
+
+```
+## [1] "/tmp/RtmpFVYWeb/layoutGraph.xml"
+```
+
 
 pipelines
 ---------
