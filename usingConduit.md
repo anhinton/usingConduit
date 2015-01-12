@@ -473,8 +473,71 @@ pipelineExample <-
 ```
 
 #### `addComponent()`
+
+`addComponent` can be used to add a `module` or `pipeline` to the
+components of a `pipeline` created created with `pipeline()` or
+`loadPipeline()`.
+
+Arguments:
+
+  + `newComponent`: `module` or `pipeline` object to be added.
+  + `pipeline`: pipeline to be amended.
+
+Example:
+
+
+```r
+testPipeline <- pipeline("test")
+plotGraph <- loadModule("plotGraph",
+                        file.path("simpleGraph", "plotGraph.xml"))
+testPipeline <- addComponent(plotGraph, testPipeline)
+```
+
 #### `pipe()`
+
+This function creates a `pipe` object, which connects the output of
+one pipeline component to the input of another pipeline component. The
+function requirtes four character vectors as arguments:
+
+  + `startComponent`: name of the start component.
+  + `startOutput`: name of the required start component output.
+  + `endComponent`: name of the end component.
+  + `endInput`: name of the requrired end component input.
+
+Example:
+
+
+```r
+pipe1 <- pipe(startComponent = "createGraph", startOutput = "myGraph",
+              endComponent = "layoutGraph", endInput = "directedGraph")
+```
+
 #### `addPipe()`
+
+`addPipe()` can be used to add a new pipe to an existing `pipeline` object.
+
+Arguments:
+
+  + `newPipe`: new `pipe` object.
+  + `pipeleine`: existing `pipeline` object.
+
+Example:
+
+
+```r
+createGraph <- loadModule("createGraph", 
+                          file.path("simpleGraph", "createGraph.xml"))
+layoutGraph <- loadModule("layoutGraph",
+                          file.path("simpleGraph", "layoutGraph.xml"))
+pipelineExample <- 
+    pipeline(name = "example", 
+             components = list(createGraph, layoutGraph))
+## create new pipe
+pipe1 <- pipe("createGraph", "directedGraph", "layoutGraph", "myGraph")
+## add pipe to pipeline
+pipelineExample <- addPipe(pipe1, pipelineExample)
+```
+
 
 ### Executing pipeline components
 

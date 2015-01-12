@@ -328,8 +328,47 @@ pipelineExample &lt;-<span class="st"> </span>
              <span class="dt">components =</span> <span class="kw">list</span>(createGraph, layoutGraph),
              <span class="dt">pipes =</span> <span class="kw">list</span>(pipe1))</code></pre>
 <h4 id="addcomponent"><code>addComponent()</code></h4>
+<p><code>addComponent</code> can be used to add a <code>module</code> or <code>pipeline</code> to the components of a <code>pipeline</code> created created with <code>pipeline()</code> or <code>loadPipeline()</code>.</p>
+<p>Arguments:</p>
+<ul>
+<li><code>newComponent</code>: <code>module</code> or <code>pipeline</code> object to be added.</li>
+<li><code>pipeline</code>: pipeline to be amended.</li>
+</ul>
+<p>Example:</p>
+<pre class="sourceCode r"><code class="sourceCode r">testPipeline &lt;-<span class="st"> </span><span class="kw">pipeline</span>(<span class="st">&quot;test&quot;</span>)
+plotGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="st">&quot;plotGraph&quot;</span>,
+                        <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;plotGraph.xml&quot;</span>))
+testPipeline &lt;-<span class="st"> </span><span class="kw">addComponent</span>(plotGraph, testPipeline)</code></pre>
 <h4 id="pipe"><code>pipe()</code></h4>
+<p>This function creates a <code>pipe</code> object, which connects the output of one pipeline component to the input of another pipeline component. The function requirtes four character vectors as arguments:</p>
+<ul>
+<li><code>startComponent</code>: name of the start component.</li>
+<li><code>startOutput</code>: name of the required start component output.</li>
+<li><code>endComponent</code>: name of the end component.</li>
+<li><code>endInput</code>: name of the requrired end component input.</li>
+</ul>
+<p>Example:</p>
+<pre class="sourceCode r"><code class="sourceCode r">pipe1 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="dt">startComponent =</span> <span class="st">&quot;createGraph&quot;</span>, <span class="dt">startOutput =</span> <span class="st">&quot;myGraph&quot;</span>,
+              <span class="dt">endComponent =</span> <span class="st">&quot;layoutGraph&quot;</span>, <span class="dt">endInput =</span> <span class="st">&quot;directedGraph&quot;</span>)</code></pre>
 <h4 id="addpipe"><code>addPipe()</code></h4>
+<p><code>addPipe()</code> can be used to add a new pipe to an existing <code>pipeline</code> object.</p>
+<p>Arguments:</p>
+<ul>
+<li><code>newPipe</code>: new <code>pipe</code> object.</li>
+<li><code>pipeleine</code>: existing <code>pipeline</code> object.</li>
+</ul>
+<p>Example:</p>
+<pre class="sourceCode r"><code class="sourceCode r">createGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="st">&quot;createGraph&quot;</span>, 
+                          <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;createGraph.xml&quot;</span>))
+layoutGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="st">&quot;layoutGraph&quot;</span>,
+                          <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;layoutGraph.xml&quot;</span>))
+pipelineExample &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">pipeline</span>(<span class="dt">name =</span> <span class="st">&quot;example&quot;</span>, 
+             <span class="dt">components =</span> <span class="kw">list</span>(createGraph, layoutGraph))
+## create new pipe
+pipe1 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="st">&quot;createGraph&quot;</span>, <span class="st">&quot;directedGraph&quot;</span>, <span class="st">&quot;layoutGraph&quot;</span>, <span class="st">&quot;myGraph&quot;</span>)
+## add pipe to pipeline
+pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pipe1, pipelineExample)</code></pre>
 <h3 id="executing-pipeline-components">Executing pipeline components</h3>
 <h4 id="runpipeline"><code>runPipeline()</code></h4>
 <h4 id="runcomponent"><code>runComponent()</code></h4>
