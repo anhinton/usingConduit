@@ -44,6 +44,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><a href="#run-a-pipeline-in-conduit">Run a pipeline in conduit</a></li>
 </ul></li>
 <li><a href="#searching-for-files-in-conduit">Searching for files in conduit</a></li>
+<li><a href="#internal-inputs-and-outputs-in-conduit">Internal inputs and outputs in conduit</a></li>
 <li><a href="#modules">modules</a><ul>
 <li><a href="#loading-modules-from-xml">Loading modules from XML</a><ul>
 <li><a href="#loadmodule"><code>loadModule()</code></a></li>
@@ -127,6 +128,7 @@ simpleGraph &lt;-<span class="st"> </span>
 <p>The following example will attemp to load a module by searching for a file named in <code>ref</code> in the paths listed in <code>path</code>, and then the default search paths.</p>
 <pre class="sourceCode r"><code class="sourceCode r">mod1 &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="dt">name =</span> <span class="st">&quot;loader&quot;</span>, <span class="dt">ref =</span> <span class="st">&quot;arrangeLines.xml&quot;</span>,
                    <span class="dt">path =</span> <span class="st">&quot;~/openapi|/media/ashley/floppyDisk|&quot;</span>)</code></pre>
+<h2 id="internal-inputs-and-outputs-in-conduit">Internal inputs and outputs in conduit</h2>
 <h2 id="modules">modules</h2>
 <p>This sections describes how to: load modules from XML files; create modules; execute module source scripts; save modules as module XML files.</p>
 <h3 id="loading-modules-from-xml">Loading modules from XML</h3>
@@ -371,7 +373,44 @@ pipe1 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="st
 pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pipe1, pipelineExample)</code></pre>
 <h3 id="executing-pipeline-components">Executing pipeline components</h3>
 <h4 id="runpipeline"><code>runPipeline()</code></h4>
+<p>Pipeline can be executed using the <code>runPipeline()</code> function. The pipeline's components will be executed in an order which ensures each component's inputs will be satisfied. This function creates a directory called 'pipelines' in the current working directory. The output from a pipeline's components are saved in this diretory, in a sub-directory named after the pipeline.</p>
+<p>This function has one argument, <code>pipeline</code>, which must be a pipeline object created using <code>pipeline()</code> or <code>loadPipeline()</code>.</p>
+<p>Example:</p>
+<pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span><span class="kw">loadPipeline</span>(<span class="st">&quot;simpleGraph&quot;</span>,
+                            <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>))
+<span class="kw">runPipeline</span>(simpleGraph)</code></pre>
 <h4 id="runcomponent"><code>runComponent()</code></h4>
+<p>Individual components in a pipeline can be executed using the <code>runComponent()</code> function. This can be useful for testing a pipeline. This function requires two arguments:</p>
+<ul>
+<li><code>componentName</code>: Name of component to be executed.</li>
+<li><code>pipeline</code>: <code>pipeline</code> containing component.</li>
+</ul>
+<p>If the component is a module with one or more inputs, these massed be provided as a named list to the <code>inputs</code> argument.</p>
+<p><code>runComponent()</code> will place component output in either a 'modules' or 'pipelines' directory, depending on the type of component. The location of this output directory can be specified using the <code>pipelinePath</code> argument.</p>
+<p>Examples:</p>
+<p>Running a component with no inputs:</p>
+<pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span><span class="kw">loadPipeline</span>(<span class="st">&quot;simpleGraph&quot;</span>,
+                            <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>))
+<span class="kw">names</span>(simpleGraph$components)</code></pre>
+<pre><code>## [1] &quot;plotGraph&quot;   &quot;createGraph&quot; &quot;layoutGraph&quot;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runComponent</span>(<span class="dt">componentName =</span> <span class="st">&quot;createGraph&quot;</span>, <span class="dt">pipeline =</span> simpleGraph)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<p>The component's output can be found in <a href="modules/createGraph" class="uri">modules/createGraph</a>:</p>
+<ul>
+<li><a href="modules/createGraph/directedGraph.rds">directedGraph.rds</a></li>
+</ul>
+<p>Running a component with one input:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runComponent</span>(<span class="st">&quot;layoutGraph&quot;</span>, simpleGraph,
+             <span class="dt">inputs =</span> 
+                 <span class="kw">list</span>(<span class="dt">myGraph =</span>
+                          <span class="kw">normalizePath</span>(
+                              <span class="kw">file.path</span>(<span class="st">&quot;modules&quot;</span>, <span class="st">&quot;createGraph&quot;</span>,
+                                        <span class="st">&quot;directedGraph.rds&quot;</span>))))</code></pre>
+<pre><code>## [1] 0</code></pre>
+<p>The component's output can be found in <a href="modules/layoutGraph" class="uri">modules/layoutGraph</a>:</p>
+<ul>
+<li><a href="modules/createGraph/Ragraph.rds">Ragraph.rds</a></li>
+</ul>
 <h3 id="saving-and-exporting-pipelines-as-xml-files">Saving and exporting pipelines as XML files</h3>
 <h4 id="savepipeline"><code>savePipeline()</code></h4>
 <h4 id="exportpipeline"><code>exportPipeline()</code></h4>

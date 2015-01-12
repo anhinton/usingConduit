@@ -135,6 +135,12 @@ mod1 <- loadModule(name = "loader", ref = "arrangeLines.xml",
 ```
 
 
+Internal inputs and outputs in conduit
+--------------------------------------
+
+FIXME: write explanations of file types
+
+
 modules
 -------
 
@@ -518,7 +524,72 @@ pipelineExample <- addPipe(pipe1, pipelineExample)
 ### Executing pipeline components
 
 #### `runPipeline()`
+
+Pipeline can be executed using the `runPipeline()` function. The
+pipeline's components will be executed in an order which ensures each
+component's inputs will be satisfied. This function creates a
+directory called 'pipelines' in the current working directory. The
+output from a pipeline's components are saved in this diretory, in a
+sub-directory named after the pipeline.
+
+This function has one argument, `pipeline`, which must be a pipeline
+object created using `pipeline()` or `loadPipeline()`.
+
+Example:
+
+```{r runPipelineExample}
+simpleGraph <- loadPipeline("simpleGraph",
+                            file.path("simpleGraph", "pipeline.xml"))
+runPipeline(simpleGraph)
+```
+
 #### `runComponent()`
+
+Individual components in a pipeline can be executed using the
+`runComponent()` function. This can be useful for testing a
+pipeline. This function requires two arguments:
+
+  + `componentName`: Name of component to be executed.
+  + `pipeline`: `pipeline` containing component.
+
+If the component is a module with one or more inputs, these massed be provided
+as a named list to the `inputs` argument.
+
+`runComponent()` will place component output in either a 'modules' or
+'pipelines' directory, depending on the type of component. The location of this
+output directory can be specified using the `pipelinePath` argument.
+
+Examples:
+
+Running a component with no inputs:
+
+```{r runComponentExample1}
+simpleGraph <- loadPipeline("simpleGraph",
+                            file.path("simpleGraph", "pipeline.xml"))
+names(simpleGraph$components)
+runComponent(componentName = "createGraph", pipeline = simpleGraph)
+```
+
+The component's output can be found in 
+[modules/createGraph](modules/createGraph):  
+
+  + [directedGraph.rds](modules/createGraph/directedGraph.rds)
+
+Running a component with one input:
+
+```{r runComponentExample2}
+runComponent("layoutGraph", simpleGraph,
+             inputs = 
+                 list(myGraph =
+                          normalizePath(
+                              file.path("modules", "createGraph",
+                                        "directedGraph.rds"))))
+```
+
+The component's output can be found in 
+[modules/layoutGraph](modules/layoutGraph):  
+
+  + [Ragraph.rds](modules/createGraph/Ragraph.rds)
     
 ### Saving and exporting pipelines as XML files
 
