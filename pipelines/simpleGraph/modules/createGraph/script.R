@@ -1,4 +1,4 @@
-setwd("/home/ahin017/files.fos/openapi/usingConduit/pipelines/simpleGraph/modules/createGraph")
+setwd("/home/ahin017/files.fos/openapi/documentation/usingConduit/pipelines/simpleGraph/modules/createGraph")
 library(graph)
 nodes <- c("a", "b", "c", "d")
 edgeList <- list(a=list(edges=c("b")),

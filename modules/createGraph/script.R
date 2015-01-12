@@ -1,4 +1,4 @@
-setwd("/home/ahin017/files.fos/openapi/usingConduit/modules/createGraph")
+setwd("/home/ahin017/files.fos/openapi/documentation/usingConduit/modules/createGraph")
 library(graph)
 nodes <- c("a", "b", "c", "d")
 edgeList <- list(a=list(edges=c("b")),

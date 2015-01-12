@@ -1,5 +1,5 @@
-setwd("/home/ahin017/files.fos/openapi/usingConduit/modules/layoutGraph")
-myGraph <- readRDS("/home/ahin017/files.fos/openapi/usingConduit/modules/createGraph/directedGraph.rds")
+setwd("/home/ahin017/files.fos/openapi/documentation/usingConduit/modules/layoutGraph")
+myGraph <- readRDS("/home/ahin017/files.fos/openapi/documentation/usingConduit/modules/createGraph/directedGraph.rds")
 library(Rgraphviz)
 Ragraph <- agopen(myGraph, "myGraph")
 saveRDS(Ragraph, file="Ragraph.rds")
