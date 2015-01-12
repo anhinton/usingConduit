@@ -578,6 +578,8 @@ The component's output can be found in
 Running a component with one input:
 
 ```{r runComponentExample2}
+simpleGraph <- loadPipeline("simpleGraph",
+                            file.path("simpleGraph", "pipeline.xml"))
 runComponent("layoutGraph", simpleGraph,
              inputs = 
                  list(myGraph =
@@ -593,8 +595,67 @@ The component's output can be found in
     
 ### Saving and exporting pipelines as XML files
 
+Pipelines created using can `pipeline()` and `loadPipeline()` can be
+saved to disk as XML files using the `savePipeline()` and
+`exportPipeline()` functions. `savePipeline()` will produce a single
+XML representing the pipeline; `exportPipeline()` will also create an XML
+file for each of the pipeline's components.
+
 #### `savePipeline()`
+
+A pipeline can be saved to an XML file using `savePipeline()`. The
+`pipeline` argument must be provided with a `pipeline` object. The resulting
+xml file is always called `pipeline.xml`. The location of this file can
+be set using the `targetDirectory` argument.
+
+Example:
+
+```{r createSaveDir, echo=FALSE}
+if (!file.exists("savePipeline")) {
+    dir.create("savePipeline")
+}
+```
+
+```{r savePipelineExample}
+simpleGraph <- loadPipeline("simpleGraph",
+                            file.path("simpleGraph", "pipeline.xml"))
+savePipeline(pipeline = simpleGraph, targetDirectory = "savePipeline")
+```
+
+The resulting XML file can be found in 
+[savePipeline](savePipeline):  
+
+  + [pipeline.xml](savePipeline/pipeline.xml)
+
 #### `exportPipeline()`
+
+`exportPipeline()` will save a pipeline to XML file, and save all its
+components to XML files, also. All the pipelines components will be
+given as references to the XML files created.
+
+This function will save the XML files to a directory with pipeline's name,
+in the location specified in the argument `targetDirectory`.
+
+Example:
+
+```{r createExportDir, echo=FALSE}
+if (!file.exists("exportPipeline")) {
+    dir.create("exportPipeline")
+}
+```
+
+```{r exportPipelineExample}
+simpleGraph <- loadPipeline("graphExport",
+                            file.path("simpleGraph", "pipeline.xml"))
+exportPipeline(pipeline = simpleGraph, targetDirectory = "exportPipeline")
+```
+
+The resulting XML files can be found in [exportPipeline/graphExport](exportPipeline/graphExport):
+
+  + [pipeline.xml](exportPipeline/graphExport/pipeline.xml)
+  + [plotGraph.xml](exportPipeline/graphExport/plotGraph.xml)
+  + [createGraph.xml](exportPipeline/graphExport/createGraph.xml)
+  + [layoutGraph.xml](exportPipeline/graphExport/layoutGraph.xml)
 
 
 Case study: turning R scripts into modules and a pipeline

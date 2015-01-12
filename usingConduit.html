@@ -129,6 +129,7 @@ simpleGraph &lt;-<span class="st"> </span>
 <pre class="sourceCode r"><code class="sourceCode r">mod1 &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="dt">name =</span> <span class="st">&quot;loader&quot;</span>, <span class="dt">ref =</span> <span class="st">&quot;arrangeLines.xml&quot;</span>,
                    <span class="dt">path =</span> <span class="st">&quot;~/openapi|/media/ashley/floppyDisk|&quot;</span>)</code></pre>
 <h2 id="internal-inputs-and-outputs-in-conduit">Internal inputs and outputs in conduit</h2>
+<p>FIXME: write explanations of file types</p>
 <h2 id="modules">modules</h2>
 <p>This sections describes how to: load modules from XML files; create modules; execute module source scripts; save modules as module XML files.</p>
 <h3 id="loading-modules-from-xml">Loading modules from XML</h3>
@@ -400,7 +401,9 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 <li><a href="modules/createGraph/directedGraph.rds">directedGraph.rds</a></li>
 </ul>
 <p>Running a component with one input:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runComponent</span>(<span class="st">&quot;layoutGraph&quot;</span>, simpleGraph,
+<pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span><span class="kw">loadPipeline</span>(<span class="st">&quot;simpleGraph&quot;</span>,
+                            <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>))
+<span class="kw">runComponent</span>(<span class="st">&quot;layoutGraph&quot;</span>, simpleGraph,
              <span class="dt">inputs =</span> 
                  <span class="kw">list</span>(<span class="dt">myGraph =</span>
                           <span class="kw">normalizePath</span>(
@@ -412,8 +415,43 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 <li><a href="modules/createGraph/Ragraph.rds">Ragraph.rds</a></li>
 </ul>
 <h3 id="saving-and-exporting-pipelines-as-xml-files">Saving and exporting pipelines as XML files</h3>
+<p>Pipelines created using can <code>pipeline()</code> and <code>loadPipeline()</code> can be saved to disk as XML files using the <code>savePipeline()</code> and <code>exportPipeline()</code> functions. <code>savePipeline()</code> will produce a single XML representing the pipeline; <code>exportPipeline()</code> will also create an XML file for each of the pipeline's components.</p>
 <h4 id="savepipeline"><code>savePipeline()</code></h4>
+<p>A pipeline can be saved to an XML file using <code>savePipeline()</code>. The <code>pipeline</code> argument must be provided with a <code>pipeline</code> object. The resulting xml file is always called <code>pipeline.xml</code>. The location of this file can be set using the <code>targetDirectory</code> argument.</p>
+<p>Example:</p>
+<pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span><span class="kw">loadPipeline</span>(<span class="st">&quot;simpleGraph&quot;</span>,
+                            <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>))
+<span class="kw">savePipeline</span>(<span class="dt">pipeline =</span> simpleGraph, <span class="dt">targetDirectory =</span> <span class="st">&quot;savePipeline&quot;</span>)</code></pre>
+<pre><code>## [1] &quot;savePipeline/pipeline.xml&quot;</code></pre>
+<p>The resulting XML file can be found in <a href="savePipeline" class="uri">savePipeline</a>:</p>
+<ul>
+<li><a href="savePipeline/pipeline.xml">pipeline.xml</a></li>
+</ul>
 <h4 id="exportpipeline"><code>exportPipeline()</code></h4>
+<p><code>exportPipeline()</code> will save a pipeline to XML file, and save all its components to XML files, also. All the pipelines components will be given as references to the XML files created.</p>
+<p>This function will save the XML files to a directory with pipeline's name, in the location specified in the argument <code>targetDirectory</code>.</p>
+<p>Example:</p>
+<pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span><span class="kw">loadPipeline</span>(<span class="st">&quot;graphExport&quot;</span>,
+                            <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>))
+<span class="kw">exportPipeline</span>(<span class="dt">pipeline =</span> simpleGraph, <span class="dt">targetDirectory =</span> <span class="st">&quot;exportPipeline&quot;</span>)</code></pre>
+<pre><code>## $pipeline
+## [1] &quot;exportPipeline/graphExport/pipeline.xml&quot;
+## 
+## $plotGraph
+## [1] &quot;exportPipeline/graphExport/plotGraph.xml&quot;
+## 
+## $createGraph
+## [1] &quot;exportPipeline/graphExport/createGraph.xml&quot;
+## 
+## $layoutGraph
+## [1] &quot;exportPipeline/graphExport/layoutGraph.xml&quot;</code></pre>
+<p>The resulting XML files can be found in <a href="exportPipeline/graphExport" class="uri">exportPipeline/graphExport</a>:</p>
+<ul>
+<li><a href="exportPipeline/graphExport/pipeline.xml">pipeline.xml</a></li>
+<li><a href="exportPipeline/graphExport/plotGraph.xml">plotGraph.xml</a></li>
+<li><a href="exportPipeline/graphExport/createGraph.xml">createGraph.xml</a></li>
+<li><a href="exportPipeline/graphExport/layoutGraph.xml">layoutGraph.xml</a></li>
+</ul>
 <h2 id="case-study-turning-r-scripts-into-modules-and-a-pipeline">Case study: turning R scripts into modules and a pipeline</h2>
 <h2 id="case-study-turning-something-non-r-into-a-modulepipeline">Case study: turning something non-R into a module/pipeline</h2>
 <hr />
