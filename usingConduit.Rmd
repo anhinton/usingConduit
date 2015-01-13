@@ -334,8 +334,7 @@ createGraph <- loadModule(name = "createGraph", ref = createGraphXML)
 runModule(module = createGraph, targetDirectory = getwd())
 ```
 
-The module's output can be found in 
-[modules/createGraph](modules/createGraph):  
+The module's output can be found at:  
 
   + [directedGraph.rds](modules/createGraph/directedGraph.rds)
 
@@ -570,8 +569,7 @@ names(simpleGraph$components)
 runComponent(componentName = "createGraph", pipeline = simpleGraph)
 ```
 
-The component's output can be found in 
-[modules/createGraph](modules/createGraph):  
+The component's output can be found at:  
 
   + [directedGraph.rds](modules/createGraph/directedGraph.rds)
 
@@ -588,8 +586,7 @@ runComponent("layoutGraph", simpleGraph,
                                         "directedGraph.rds"))))
 ```
 
-The component's output can be found in 
-[modules/layoutGraph](modules/layoutGraph):  
+The component's output can be found at:  
 
   + [Ragraph.rds](modules/createGraph/Ragraph.rds)
     
@@ -622,8 +619,7 @@ simpleGraph <- loadPipeline("simpleGraph",
 savePipeline(pipeline = simpleGraph, targetDirectory = "savePipeline")
 ```
 
-The resulting XML file can be found in 
-[savePipeline](savePipeline):  
+The resulting XML file can be found at:  
 
   + [pipeline.xml](savePipeline/pipeline.xml)
 

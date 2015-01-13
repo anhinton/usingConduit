@@ -9,6 +9,8 @@
   <style type="text/css">
     div.main { margin: auto; max-width: 800px; }
     code{ white-space: pre-wrap; }
+    .ann {color: green; font-style: italic; background-color: silver; border: solid thin}
+    .mod {color: red; font-style: italic; background-color: silver; border: solid thin}
   </style>
   <style type="text/css">
 table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
@@ -118,7 +120,8 @@ simpleGraph &lt;-<span class="st"> </span>
 </ol>
 <p>File number 5, <a href="pipelines/simpleGraph/modules/plotGraph/example.png" class="uri">pipelines/simpleGraph/modules/plotGraph/example.png</a> is the output file we require, the PNG image of the graph. The image is shown below:</p>
 <div class="figure">
-<img src="pipelines/simpleGraph/modules/plotGraph/example.png" alt="Pipeline output: PNG image file of graph" /><p class="caption">Pipeline output: PNG image file of graph</p>
+<img src="pipelines/simpleGraph/modules/plotGraph/example.png" alt="Pipeline output: PNG image file of graph" />
+<p class="caption">Pipeline output: PNG image file of graph</p>
 </div>
 <h2 id="searching-for-files-in-conduit">Searching for files in conduit</h2>
 <p>conduit allows the user to either specify the location of a resource file, or to provide a filename and file location(s) where the file should be found. Functions which have <code>ref</code> and <code>path</code> arguments provide the option to search for a resource.</p>
@@ -256,7 +259,7 @@ source2 &lt;-<span class="st"> </span><span class="kw">moduleSource</span>(<span
 createGraphXML &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;createGraph.xml&quot;</span>)
 createGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="dt">name =</span> <span class="st">&quot;createGraph&quot;</span>, <span class="dt">ref =</span> createGraphXML)
 <span class="kw">runModule</span>(<span class="dt">module =</span> createGraph, <span class="dt">targetDirectory =</span> <span class="kw">getwd</span>())</code></pre>
-<p>The module's output can be found in <a href="modules/createGraph" class="uri">modules/createGraph</a>:</p>
+<p>The module's output can be found at:</p>
 <ul>
 <li><a href="modules/createGraph/directedGraph.rds">directedGraph.rds</a></li>
 </ul>
@@ -396,7 +399,7 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 <pre><code>## [1] &quot;plotGraph&quot;   &quot;createGraph&quot; &quot;layoutGraph&quot;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runComponent</span>(<span class="dt">componentName =</span> <span class="st">&quot;createGraph&quot;</span>, <span class="dt">pipeline =</span> simpleGraph)</code></pre>
 <pre><code>## [1] 0</code></pre>
-<p>The component's output can be found in <a href="modules/createGraph" class="uri">modules/createGraph</a>:</p>
+<p>The component's output can be found at:</p>
 <ul>
 <li><a href="modules/createGraph/directedGraph.rds">directedGraph.rds</a></li>
 </ul>
@@ -410,7 +413,7 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
                               <span class="kw">file.path</span>(<span class="st">&quot;modules&quot;</span>, <span class="st">&quot;createGraph&quot;</span>,
                                         <span class="st">&quot;directedGraph.rds&quot;</span>))))</code></pre>
 <pre><code>## [1] 0</code></pre>
-<p>The component's output can be found in <a href="modules/layoutGraph" class="uri">modules/layoutGraph</a>:</p>
+<p>The component's output can be found at:</p>
 <ul>
 <li><a href="modules/createGraph/Ragraph.rds">Ragraph.rds</a></li>
 </ul>
@@ -423,7 +426,7 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
                             <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>))
 <span class="kw">savePipeline</span>(<span class="dt">pipeline =</span> simpleGraph, <span class="dt">targetDirectory =</span> <span class="st">&quot;savePipeline&quot;</span>)</code></pre>
 <pre><code>## [1] &quot;savePipeline/pipeline.xml&quot;</code></pre>
-<p>The resulting XML file can be found in <a href="savePipeline" class="uri">savePipeline</a>:</p>
+<p>The resulting XML file can be found at:</p>
 <ul>
 <li><a href="savePipeline/pipeline.xml">pipeline.xml</a></li>
 </ul>
