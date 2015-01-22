@@ -83,8 +83,12 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><a href="#exportpipeline"><code>exportPipeline()</code></a></li>
 </ul></li>
 </ul></li>
-<li><a href="#case-study-turning-r-scripts-into-modules-and-a-pipeline">Case study: turning R scripts into modules and a pipeline</a></li>
-<li><a href="#case-study-turning-something-non-r-into-a-modulepipeline">Case study: turning something non-R into a module/pipeline</a></li>
+<li><a href="#example-creating-a-pipeline-from-r-scripts">Example: creating a pipeline from R scripts</a><ul>
+<li><a href="#r-scripts">R scripts</a></li>
+<li><a href="#creating-the-first-module-creategraph">Creating the first module: <code>createGraph</code></a></li>
+<li><a href="#the-second-module-layoutgraph">The second module: <code>layoutGraph</code></a></li>
+<li><a href="#the-last-module-plotgraph">The last module: <code>plotGraph</code></a></li>
+</ul></li>
 </ul>
 </div>
 <h2 id="quick-start-running-a-pipeline">Quick start: running a pipeline</h2>
@@ -455,10 +459,89 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 <li><a href="exportPipeline/graphExport/createGraph.xml">createGraph.xml</a></li>
 <li><a href="exportPipeline/graphExport/layoutGraph.xml">layoutGraph.xml</a></li>
 </ul>
-<h2 id="case-study-turning-r-scripts-into-modules-and-a-pipeline">Case study: turning R scripts into modules and a pipeline</h2>
-<h2 id="case-study-turning-something-non-r-into-a-modulepipeline">Case study: turning something non-R into a module/pipeline</h2>
+<h2 id="example-creating-a-pipeline-from-r-scripts">Example: creating a pipeline from R scripts</h2>
+<p>In this example I will demonstrate how a pipeline can be created using R scripts for the modules' source scripts. We will create the &quot;simpleGraph&quot; module seen throughout this document. All this pipeline's modules will be executed on the &quot;R&quot; platform. The first module creates a graphNEL object; the second module will use this &quot;graphNEL&quot; object to create an &quot;Ragraph&quot; object; the last module will produce a PNG image of the &quot;Ragraph&quot; object.</p>
+<h3 id="r-scripts">R scripts</h3>
+<p>The R scripts for our example are as follows:</p>
+<ul>
+<li><a href="example1/scripts/createGraph.R">createGraph.R</a>:</li>
+</ul>
+<pre><code>## library(graph)
+## nodes &lt;- c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;)
+## edgeList &lt;- list(a=list(edges=c(&quot;b&quot;)),
+##                  b=list(edges=c(&quot;c&quot;)),
+##                  c=list(edges=c(&quot;d&quot;)),
+##                  d=list(edges=c(&quot;a&quot;)))
+## directedGraph &lt;- new(&quot;graphNEL&quot;, nodes=nodes, edgeL=edgeList, 
+##                      edgemode=&quot;directed&quot;)</code></pre>
+<ul>
+<li><a href="example1/scripts/layoutGraph.R">layoutGraph.R</a>:</li>
+</ul>
+<pre><code>## library(Rgraphviz)
+## Ragraph &lt;- agopen(myGraph, &quot;myGraph&quot;)</code></pre>
+<ul>
+<li><a href="example1/scripts/plotGraph.R">plotGraph.R</a>:</li>
+</ul>
+<pre><code>## library(gridGraphviz)
+## png(&quot;example.png&quot;)
+## grid.graph(Ragraph, newpage=TRUE)
+## dev.off()</code></pre>
+<p>R users will notice that the second script calls for a &quot;graphNEL&quot; object 'myGraph', but that no such object has been created in the preceding scripts. This object will be named as an input of the second module, and will be made available to the module's R script by the glue system.</p>
+<h3 id="creating-the-first-module-creategraph">Creating the first module: <code>createGraph</code></h3>
+<p>The first module will has source script, from the file <a href="example1/scripts/createGraph.R">createGraph.R</a>:</p>
+<pre class="sourceCode r"><code class="sourceCode r">createGraphSource &lt;-<span class="st"> </span><span class="kw">moduleSource</span>(<span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;example1&quot;</span>, <span class="st">&quot;scripts&quot;</span>,
+                                                  <span class="st">&quot;createGraph.R&quot;</span>))</code></pre>
+<p>This script creates an 'R &quot;graphNEL&quot; object, <code>directedGraph</code>, which we will name as an internal output:</p>
+<pre class="sourceCode r"><code class="sourceCode r">createGraphOutput &lt;-<span class="st"> </span><span class="kw">moduleOutput</span>(<span class="dt">name =</span> <span class="st">&quot;directedGraph&quot;</span>,
+                                  <span class="dt">type =</span> <span class="st">&quot;internal&quot;</span>,
+                                  <span class="dt">format =</span> <span class="st">&quot;R </span><span class="ch">\&quot;</span><span class="st">graphNEL</span><span class="ch">\&quot;</span><span class="st"> object&quot;</span>)</code></pre>
+<p>Now we can create a module object, <code>createGraph</code>, with the name, &quot;createGraph&quot;, a description, and the source and output created above:</p>
+<pre class="sourceCode r"><code class="sourceCode r">createGraph &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">module</span>(<span class="dt">name =</span> <span class="st">&quot;createGraph&quot;</span>,
+           <span class="dt">platform =</span> <span class="st">&quot;R&quot;</span>,
+           <span class="dt">description =</span> <span class="st">&quot;Create a simple directed graphNEL graph object with four nodes and four edges&quot;</span>,
+           <span class="dt">sources =</span> 
+               <span class="kw">list</span>(createGraphSource),
+           <span class="dt">outputs =</span> 
+               <span class="kw">list</span>(createGraphOutput))</code></pre>
+<h3 id="the-second-module-layoutgraph">The second module: <code>layoutGraph</code></h3>
+<p>As mentioned above, our second module script requires a &quot;graphNEL&quot; object, <code>myGraph</code>. We will create our module with an internal input called <code>myGraph</code> which conduit will use to provide this module with its required object:</p>
+<pre class="sourceCode r"><code class="sourceCode r">layoutGraphInput &lt;-<span class="st"> </span><span class="kw">moduleInput</span>(<span class="dt">name =</span> <span class="st">&quot;myGraph&quot;</span>,
+                                <span class="dt">type =</span> <span class="st">&quot;internal&quot;</span>,
+                                <span class="dt">format =</span> <span class="st">&quot;R </span><span class="ch">\&quot;</span><span class="st">graphNEL</span><span class="ch">\&quot;</span><span class="st"> object&quot;</span>)</code></pre>
+<p>This module has one source, from the file <a href="example1/scripts/layoutGraph.R">layoutGraph.R</a>, which produces an &quot;Ragraph&quot; object, <code>Ragraph</code>, which we will name as an output. We create the module with the following code:</p>
+<pre class="sourceCode r"><code class="sourceCode r">layoutGraph &lt;-
+<span class="st">    </span><span class="kw">module</span>(<span class="dt">name =</span> <span class="st">&quot;layoutGraph&quot;</span>,
+           <span class="dt">platform =</span> <span class="st">&quot;R&quot;</span>,
+           <span class="dt">description =</span> <span class="st">&quot;Lays out a graphNEL graph using the Rgraphviz package&quot;</span>,
+           <span class="dt">inputs =</span> <span class="kw">list</span>(layoutGraphInput),
+           <span class="dt">sources =</span> <span class="kw">list</span>(<span class="kw">moduleSource</span>(<span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;example1&quot;</span>, <span class="st">&quot;scripts&quot;</span>,
+                                                       <span class="st">&quot;layoutGraph.R&quot;</span>))),
+           <span class="dt">outputs =</span> <span class="kw">list</span>(<span class="kw">moduleOutput</span>(<span class="dt">name =</span> <span class="st">&quot;Ragraph&quot;</span>,
+                                       <span class="dt">type =</span> <span class="st">&quot;internal&quot;</span>,
+                                       <span class="dt">format =</span> <span class="st">&quot;R </span><span class="ch">\&quot;</span><span class="st">Ragraph</span><span class="ch">\&quot;</span><span class="st"> object&quot;</span>)))</code></pre>
+<h3 id="the-last-module-plotgraph">The last module: <code>plotGraph</code></h3>
+<p>The final script creates a PNG file, named &quot;example.png&quot;, in the current working directory. We will create an external output for this module, called <code>example.png</code>, which give the filename as its <code>ref</code>:</p>
+<pre class="sourceCode r"><code class="sourceCode r">plotGraphOutput &lt;-<span class="st"> </span><span class="kw">moduleOutput</span>(<span class="dt">name =</span> <span class="st">&quot;example.png&quot;</span>,
+                                <span class="dt">type =</span> <span class="st">&quot;external&quot;</span>,
+                                <span class="dt">ref =</span> <span class="st">&quot;example.png&quot;</span>,
+                                <span class="dt">format =</span> <span class="st">&quot;PNG image file&quot;</span>)</code></pre>
+<p>This module has one source script, from the file <a href="example1/scripts/plotGraph.R">plotGraph.R</a>. This script requires an &quot;Ragraph&quot; object, <code>Ragraph</code>. We create the module <code>plotGraph</code> with the following code:</p>
+<pre class="sourceCode r"><code class="sourceCode r">plotGraph &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">module</span>(<span class="dt">name =</span> <span class="st">&quot;plotGraph&quot;</span>,
+           <span class="dt">platform =</span> <span class="st">&quot;R&quot;</span>,
+           <span class="dt">description =</span> <span class="st">&quot;Plots an Ragraph object to a PNG file using the gridGraphviz package&quot;</span>,
+           <span class="dt">inputs =</span> <span class="kw">list</span>(<span class="kw">moduleInput</span>(<span class="dt">name =</span> <span class="st">&quot;Ragraph&quot;</span>,
+                                     <span class="dt">type =</span> <span class="st">&quot;internal&quot;</span>,
+                                     <span class="dt">format =</span> <span class="st">&quot;R </span><span class="ch">\&quot;</span><span class="st">Ragraph</span><span class="ch">\&quot;</span><span class="st"> object&quot;</span>)),
+           <span class="dt">sources =</span> <span class="kw">list</span>(<span class="kw">moduleSource</span>(<span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;example1&quot;</span>, <span class="st">&quot;scripts&quot;</span>,
+                                                       <span class="st">&quot;plotGraph.R&quot;</span>))),
+           <span class="dt">outputs =</span> <span class="kw">list</span>(plotGraphOutput))</code></pre>
 <hr />
 <p><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Guide to using conduit</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://canadia.co.nz/" property="cc:attributionName" rel="cc:attributionURL">Ashley Noel Hinton</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.</p>
+<div class="references">
+
+</div>
 </div>
 </body>
 </html>

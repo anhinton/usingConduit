@@ -654,11 +654,141 @@ The resulting XML files can be found at:
   + [layoutGraph.xml](exportPipeline/graphExport/layoutGraph.xml)
 
 
-Case study: turning R scripts into modules and a pipeline
-----------
+Example: creating a pipeline from R scripts
+-------
 
-Case study: turning something non-R into a module/pipeline
-----------
+In this example I will demonstrate how a pipeline can be created using
+R scripts for the modules' source scripts. We will create the
+"simpleGraph" module seen throughout this document. All this
+pipeline's modules will be executed on the "R" platform. The first
+module creates a graphNEL object; the second module will use this
+"graphNEL" object to create an "Ragraph" object; the last module will
+produce a PNG image of the "Ragraph" object.
+
+### R scripts
+
+The R scripts for our example are as follows: 
+
+  + [createGraph.R](example1/scripts/createGraph.R):
+
+```{r createGraphScript, echo=FALSE}
+cat(readLines("example1/scripts/createGraph.R"), sep="\n")
+```
+    
+  + [layoutGraph.R](example1/scripts/layoutGraph.R):
+
+```{r layoutGraphScript, echo=FALSE}
+cat(readLines("example1/scripts/layoutGraph.R"), sep="\n")
+```
+    
+  + [plotGraph.R](example1/scripts/plotGraph.R):
+
+```{r plotGraphScript, echo=FALSE}
+cat(readLines("example1/scripts/plotGraph.R"), sep="\n")
+```
+
+R users will notice that the second script calls for a "graphNEL"
+object 'myGraph', but that no such object has been created in the
+preceding scripts. This object will be named as an input of the second
+module, and will be made available to the module's R script by the
+glue system.
+
+### Creating the first module: `createGraph`
+
+The first module will has source script, from the file
+[createGraph.R](example1/scripts/createGraph.R):
+
+```{r createGraphSource}
+createGraphSource <- moduleSource(ref = file.path("example1", "scripts",
+                                                  "createGraph.R"))
+```
+
+This script creates an 'R "graphNEL" object, `directedGraph`, which we will 
+name as an internal output:
+
+```{r createGraphOutput}
+createGraphOutput <- moduleOutput(name = "directedGraph",
+                                  type = "internal",
+                                  format = "R \"graphNEL\" object")
+```
+
+Now we can create a module object, `createGraph`, with the name,
+"createGraph", a description, and the source and output created above:
+
+```{r createGraphModule}
+createGraph <- 
+    module(name = "createGraph",
+           platform = "R",
+           description = "Create a simple directed graphNEL graph object with four nodes and four edges",
+           sources = 
+               list(createGraphSource),
+           outputs = 
+               list(createGraphOutput))
+```
+
+### The second module: `layoutGraph`
+
+As mentioned above, our second module script requires a "graphNEL"
+object, `myGraph`. We will create our module with an internal input
+called `myGraph` which conduit will use to provide this module with
+its required object:
+
+```{r layoutGraphInput}
+layoutGraphInput <- moduleInput(name = "myGraph",
+                                type = "internal",
+                                format = "R \"graphNEL\" object")
+```
+
+This module has one source, from the file
+[layoutGraph.R](example1/scripts/layoutGraph.R), which produces an
+"Ragraph" object, `Ragraph`, which we will name as an output. We
+create the module with the following code:
+
+```{r layoutGraphModule}
+layoutGraph <-
+    module(name = "layoutGraph",
+           platform = "R",
+           description = "Lays out a graphNEL graph using the Rgraphviz package",
+           inputs = list(layoutGraphInput),
+           sources = list(moduleSource(ref = file.path("example1", "scripts",
+                                                       "layoutGraph.R"))),
+           outputs = list(moduleOutput(name = "Ragraph",
+                                       type = "internal",
+                                       format = "R \"Ragraph\" object")))
+```
+
+### The last module: `plotGraph`
+
+The final script creates a PNG file, named "example.png", in the
+current working directory. We will create an external output for this
+module, called `example.png`, which give the filename as its `ref`:
+
+```{r plotGraphOutput}
+plotGraphOutput <- moduleOutput(name = "example.png",
+                                type = "external",
+                                ref = "example.png",
+                                format = "PNG image file")
+```
+
+
+This module has one source script, from the file
+[plotGraph.R](example1/scripts/plotGraph.R). This script requires an
+"Ragraph" object, `Ragraph`. We create the module `plotGraph` with the
+following code:
+
+```{r plotGraphModule}
+plotGraph <- 
+    module(name = "plotGraph",
+           platform = "R",
+           description = "Plots an Ragraph object to a PNG file using the gridGraphviz package",
+           inputs = list(moduleInput(name = "Ragraph",
+                                     type = "internal",
+                                     format = "R \"Ragraph\" object")),
+           sources = list(moduleSource(ref = file.path("example1", "scripts",
+                                                       "plotGraph.R"))),
+           outputs = list(plotGraphOutput))
+```
+
 
 ----
 
