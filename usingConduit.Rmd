@@ -688,14 +688,15 @@ cat(readLines("example1/scripts/plotGraph.R"), sep="\n")
 ```
 
 R users will notice that the second script calls for a "graphNEL"
-object 'myGraph', but that no such object has been created in the
+object `myGraph`, but that no such object has been created in the
 preceding scripts. This object will be named as an input of the second
 module, and will be made available to the module's R script by the
-glue system.
+glue system. The object `Ragraph` in the third script will also be
+named as an nput for the third module.
 
 ### Creating the first module: `createGraph`
 
-The first module will has source script, from the file
+The first module has one source script, from the file
 [createGraph.R](example1/scripts/createGraph.R):
 
 ```{r createGraphSource}
@@ -703,8 +704,8 @@ createGraphSource <- moduleSource(ref = file.path("example1", "scripts",
                                                   "createGraph.R"))
 ```
 
-This script creates an 'R "graphNEL" object, `directedGraph`, which we will 
-name as an internal output:
+The source script creates an 'R "graphNEL" object, `directedGraph`,
+which we will name as an internal output:
 
 ```{r createGraphOutput}
 createGraphOutput <- moduleOutput(name = "directedGraph",
@@ -730,7 +731,7 @@ createGraph <-
 
 As mentioned above, our second module script requires a "graphNEL"
 object, `myGraph`. We will create our module with an internal input
-called `myGraph` which conduit will use to provide this module with
+called `myGraph` which *conduit* will use to provide this module with
 its required object:
 
 ```{r layoutGraphInput}
@@ -741,7 +742,7 @@ layoutGraphInput <- moduleInput(name = "myGraph",
 
 This module has one source, from the file
 [layoutGraph.R](example1/scripts/layoutGraph.R), which produces an
-"Ragraph" object, `Ragraph`, which we will name as an output. We
+"Ragraph" object, `Ragraph`. We will name `Ragraph` as an output. We
 create the module with the following code:
 
 ```{r layoutGraphModule}
@@ -761,7 +762,8 @@ layoutGraph <-
 
 The final script creates a PNG file, named "example.png", in the
 current working directory. We will create an external output for this
-module, called `example.png`, which give the filename as its `ref`:
+module, called "example.png", and record the filename as the output's
+`ref`:
 
 ```{r plotGraphOutput}
 plotGraphOutput <- moduleOutput(name = "example.png",
@@ -789,6 +791,82 @@ plotGraph <-
            outputs = list(plotGraphOutput))
 ```
 
+### Creating `pipe`s
+
+A pipeline consists of a set of components, and a set of pipes describing
+how component outputs are connected to other component inputs. The modules
+created above are our components; we will now create our pipes.
+
+The `createGraph` module has an internal output, "directedGraph", a
+'graphNEL' object. We would like our pipeline to pass this output to
+the `layoutGraph` module, which requires a 'graphNEL' object called
+"myGraph" as an internal input. The following code will create this
+pipe:
+
+```{r createPipe1}
+pipe1 <- pipe(startComponent = "createGraph", startOutput = "directedGraph",
+              endComponent = "layoutGraph", endInput = "myGraph")
+```
+
+We also need a pipe connecting the internal output "Ragraph" in
+`layoutGraph` to the internal input "Ragraph" in `plotGraph`. This is
+done with the following code:
+
+```{r createPipe2}
+pipe2 <- pipe(startComponent = "layoutGraph", startOutput = "Ragraph",
+              endComponent = "plotGraph", endInput = "Ragraph")
+```
+
+### Creating the `simpleGraph` pipeline
+
+We now have all the necessary pieces to create our `simpleGraph`
+pipeline. We have our list of components:
+
+```{r componentsList}
+componentsList <- list(createGraph, layoutGraph, plotGraph)
+```
+
+and our list of pipes:
+
+```{r pipesList}
+pipesList <- list(pipe1, pipe2)
+```
+
+The following code creates our pipeline object:
+
+```{r simpleGraphPipeline}
+simpleGraph <- pipeline(name = "simpleGraph",
+                        description = "This pipeline creates a directed graphNEL graph, lays it out using the Rgraphviz package, and then plots the graph as a PNG file using the gridGraphviz package",
+                        components = componentsList,
+                        pipes = pipesList)
+```
+
+### Exporting the `simpleGraph` pipeline to XML
+
+Our final step is to export the `simpleGraph` pipeline and its
+components to XML files so we can share them. The following code will
+create a directory with the same name as our pipeline, "simpleGraph",
+and create XML files for the pipeline and each of its components in
+this directory. This is done with the following code:
+
+```{r exportSimpleGraph, results='hide'}
+exportPipeline(pipeline = simpleGraph,
+               targetDirectory = file.path(getwd(), "example1"))
+```
+
+The resulting pipeline file,
+[example1/simpleGraph/pipeline.xml](example1/simpleGraph/pipeline.xml),
+contains the following XML:
+
+```{r exportExampleContent, echo=FALSE}
+cat(readLines("example1/simpleGraph/pipeline.xml"), sep="\n")
+```
+
+The component XML files can be seen at:
+
+  + [example1/simpleGraph/createGraph.xml](example1/simpleGraph/createGraph.xml)
+  + [example1/simpleGraph/layoutGraph.xml](example1/simpleGraph/layoutGraph.xml)
+  + [example1/simpleGraph/plotGraph.xml](example1/simpleGraph/plotGraph.xml)
 
 ----
 

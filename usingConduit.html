@@ -88,6 +88,9 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><a href="#creating-the-first-module-creategraph">Creating the first module: <code>createGraph</code></a></li>
 <li><a href="#the-second-module-layoutgraph">The second module: <code>layoutGraph</code></a></li>
 <li><a href="#the-last-module-plotgraph">The last module: <code>plotGraph</code></a></li>
+<li><a href="#creating-pipes">Creating <code>pipe</code>s</a></li>
+<li><a href="#creating-the-simplegraph-pipeline">Creating the <code>simpleGraph</code> pipeline</a></li>
+<li><a href="#exporting-the-simplegraph-pipeline-to-xml">Exporting the <code>simpleGraph</code> pipeline to XML</a></li>
 </ul></li>
 </ul>
 </div>
@@ -289,14 +292,14 @@ myGraph &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span cl
 tempTarget &lt;-<span class="st"> </span><span class="kw">tempdir</span>()
 <span class="kw">saveModule</span>(<span class="dt">module =</span> createGraph, <span class="dt">targetDirectory =</span> tempTarget,
            <span class="dt">filename =</span> <span class="st">&quot;newCreateGraph.xml&quot;</span>)</code></pre>
-<pre><code>## [1] &quot;/tmp/RtmpFVYWeb/newCreateGraph.xml&quot;</code></pre>
+<pre><code>## [1] &quot;/tmp/RtmpqdixWi/newCreateGraph.xml&quot;</code></pre>
 <p>Save a module to XML without specifiying the filename:</p>
 <pre class="sourceCode r"><code class="sourceCode r">layoutGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="st">&quot;layoutGraph&quot;</span>, 
                           <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;layoutGraph.xml&quot;</span>))
 layoutGraph$name</code></pre>
 <pre><code>## [1] &quot;layoutGraph&quot;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">saveModule</span>(<span class="dt">module =</span> layoutGraph, <span class="dt">targetDirectory =</span> tempTarget)</code></pre>
-<pre><code>## [1] &quot;/tmp/RtmpFVYWeb/layoutGraph.xml&quot;</code></pre>
+<pre><code>## [1] &quot;/tmp/RtmpqdixWi/layoutGraph.xml&quot;</code></pre>
 <h2 id="pipelines">pipelines</h2>
 <p>This sections describes how to: load pipelines from XML files; create pipelines ; execute pipeline components; save pipelines and their components as XML files.</p>
 <h3 id="loading-pipelines-from-xml">Loading pipelines from XML</h3>
@@ -486,12 +489,12 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 ## png(&quot;example.png&quot;)
 ## grid.graph(Ragraph, newpage=TRUE)
 ## dev.off()</code></pre>
-<p>R users will notice that the second script calls for a &quot;graphNEL&quot; object 'myGraph', but that no such object has been created in the preceding scripts. This object will be named as an input of the second module, and will be made available to the module's R script by the glue system.</p>
+<p>R users will notice that the second script calls for a &quot;graphNEL&quot; object <code>myGraph</code>, but that no such object has been created in the preceding scripts. This object will be named as an input of the second module, and will be made available to the module's R script by the glue system. The object <code>Ragraph</code> in the third script will also be named as an nput for the third module.</p>
 <h3 id="creating-the-first-module-creategraph">Creating the first module: <code>createGraph</code></h3>
-<p>The first module will has source script, from the file <a href="example1/scripts/createGraph.R">createGraph.R</a>:</p>
+<p>The first module has one source script, from the file <a href="example1/scripts/createGraph.R">createGraph.R</a>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">createGraphSource &lt;-<span class="st"> </span><span class="kw">moduleSource</span>(<span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;example1&quot;</span>, <span class="st">&quot;scripts&quot;</span>,
                                                   <span class="st">&quot;createGraph.R&quot;</span>))</code></pre>
-<p>This script creates an 'R &quot;graphNEL&quot; object, <code>directedGraph</code>, which we will name as an internal output:</p>
+<p>The source script creates an 'R &quot;graphNEL&quot; object, <code>directedGraph</code>, which we will name as an internal output:</p>
 <pre class="sourceCode r"><code class="sourceCode r">createGraphOutput &lt;-<span class="st"> </span><span class="kw">moduleOutput</span>(<span class="dt">name =</span> <span class="st">&quot;directedGraph&quot;</span>,
                                   <span class="dt">type =</span> <span class="st">&quot;internal&quot;</span>,
                                   <span class="dt">format =</span> <span class="st">&quot;R </span><span class="ch">\&quot;</span><span class="st">graphNEL</span><span class="ch">\&quot;</span><span class="st"> object&quot;</span>)</code></pre>
@@ -505,11 +508,11 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
            <span class="dt">outputs =</span> 
                <span class="kw">list</span>(createGraphOutput))</code></pre>
 <h3 id="the-second-module-layoutgraph">The second module: <code>layoutGraph</code></h3>
-<p>As mentioned above, our second module script requires a &quot;graphNEL&quot; object, <code>myGraph</code>. We will create our module with an internal input called <code>myGraph</code> which conduit will use to provide this module with its required object:</p>
+<p>As mentioned above, our second module script requires a &quot;graphNEL&quot; object, <code>myGraph</code>. We will create our module with an internal input called <code>myGraph</code> which <em>conduit</em> will use to provide this module with its required object:</p>
 <pre class="sourceCode r"><code class="sourceCode r">layoutGraphInput &lt;-<span class="st"> </span><span class="kw">moduleInput</span>(<span class="dt">name =</span> <span class="st">&quot;myGraph&quot;</span>,
                                 <span class="dt">type =</span> <span class="st">&quot;internal&quot;</span>,
                                 <span class="dt">format =</span> <span class="st">&quot;R </span><span class="ch">\&quot;</span><span class="st">graphNEL</span><span class="ch">\&quot;</span><span class="st"> object&quot;</span>)</code></pre>
-<p>This module has one source, from the file <a href="example1/scripts/layoutGraph.R">layoutGraph.R</a>, which produces an &quot;Ragraph&quot; object, <code>Ragraph</code>, which we will name as an output. We create the module with the following code:</p>
+<p>This module has one source, from the file <a href="example1/scripts/layoutGraph.R">layoutGraph.R</a>, which produces an &quot;Ragraph&quot; object, <code>Ragraph</code>. We will name <code>Ragraph</code> as an output. We create the module with the following code:</p>
 <pre class="sourceCode r"><code class="sourceCode r">layoutGraph &lt;-
 <span class="st">    </span><span class="kw">module</span>(<span class="dt">name =</span> <span class="st">&quot;layoutGraph&quot;</span>,
            <span class="dt">platform =</span> <span class="st">&quot;R&quot;</span>,
@@ -521,7 +524,7 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
                                        <span class="dt">type =</span> <span class="st">&quot;internal&quot;</span>,
                                        <span class="dt">format =</span> <span class="st">&quot;R </span><span class="ch">\&quot;</span><span class="st">Ragraph</span><span class="ch">\&quot;</span><span class="st"> object&quot;</span>)))</code></pre>
 <h3 id="the-last-module-plotgraph">The last module: <code>plotGraph</code></h3>
-<p>The final script creates a PNG file, named &quot;example.png&quot;, in the current working directory. We will create an external output for this module, called <code>example.png</code>, which give the filename as its <code>ref</code>:</p>
+<p>The final script creates a PNG file, named &quot;example.png&quot;, in the current working directory. We will create an external output for this module, called &quot;example.png&quot;, and record the filename as the output's <code>ref</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">plotGraphOutput &lt;-<span class="st"> </span><span class="kw">moduleOutput</span>(<span class="dt">name =</span> <span class="st">&quot;example.png&quot;</span>,
                                 <span class="dt">type =</span> <span class="st">&quot;external&quot;</span>,
                                 <span class="dt">ref =</span> <span class="st">&quot;example.png&quot;</span>,
@@ -537,6 +540,50 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
            <span class="dt">sources =</span> <span class="kw">list</span>(<span class="kw">moduleSource</span>(<span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;example1&quot;</span>, <span class="st">&quot;scripts&quot;</span>,
                                                        <span class="st">&quot;plotGraph.R&quot;</span>))),
            <span class="dt">outputs =</span> <span class="kw">list</span>(plotGraphOutput))</code></pre>
+<h3 id="creating-pipes">Creating <code>pipe</code>s</h3>
+<p>A pipeline consists of a set of components, and a set of pipes describing how component outputs are connected to other component inputs. The modules created above are our components; we will now create our pipes.</p>
+<p>The <code>createGraph</code> module has an internal output, &quot;directedGraph&quot;, a 'graphNEL' object. We would like our pipeline to pass this output to the <code>layoutGraph</code> module, which requires a 'graphNEL' object called &quot;myGraph&quot; as an internal input. The following code will create this pipe:</p>
+<pre class="sourceCode r"><code class="sourceCode r">pipe1 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="dt">startComponent =</span> <span class="st">&quot;createGraph&quot;</span>, <span class="dt">startOutput =</span> <span class="st">&quot;directedGraph&quot;</span>,
+              <span class="dt">endComponent =</span> <span class="st">&quot;layoutGraph&quot;</span>, <span class="dt">endInput =</span> <span class="st">&quot;myGraph&quot;</span>)</code></pre>
+<p>We also need a pipe connecting the internal output &quot;Ragraph&quot; in <code>layoutGraph</code> to the internal input &quot;Ragraph&quot; in <code>plotGraph</code>. This is done with the following code:</p>
+<pre class="sourceCode r"><code class="sourceCode r">pipe2 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="dt">startComponent =</span> <span class="st">&quot;layoutGraph&quot;</span>, <span class="dt">startOutput =</span> <span class="st">&quot;Ragraph&quot;</span>,
+              <span class="dt">endComponent =</span> <span class="st">&quot;plotGraph&quot;</span>, <span class="dt">endInput =</span> <span class="st">&quot;Ragraph&quot;</span>)</code></pre>
+<h3 id="creating-the-simplegraph-pipeline">Creating the <code>simpleGraph</code> pipeline</h3>
+<p>We now have all the necessary pieces to create our <code>simpleGraph</code> pipeline. We have our list of components:</p>
+<pre class="sourceCode r"><code class="sourceCode r">componentsList &lt;-<span class="st"> </span><span class="kw">list</span>(createGraph, layoutGraph, plotGraph)</code></pre>
+<p>and our list of pipes:</p>
+<pre class="sourceCode r"><code class="sourceCode r">pipesList &lt;-<span class="st"> </span><span class="kw">list</span>(pipe1, pipe2)</code></pre>
+<p>The following code creates our pipeline object:</p>
+<pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span><span class="kw">pipeline</span>(<span class="dt">name =</span> <span class="st">&quot;simpleGraph&quot;</span>,
+                        <span class="dt">description =</span> <span class="st">&quot;This pipeline creates a directed graphNEL graph, lays it out using the Rgraphviz package, and then plots the graph as a PNG file using the gridGraphviz package&quot;</span>,
+                        <span class="dt">components =</span> componentsList,
+                        <span class="dt">pipes =</span> pipesList)</code></pre>
+<h3 id="exporting-the-simplegraph-pipeline-to-xml">Exporting the <code>simpleGraph</code> pipeline to XML</h3>
+<p>Our final step is to export the <code>simpleGraph</code> pipeline and its components to XML files so we can share them. The following code will create a directory with the same name as our pipeline, &quot;simpleGraph&quot;, and create XML files for the pipeline and each of its components in this directory. This is done with the following code:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">exportPipeline</span>(<span class="dt">pipeline =</span> simpleGraph,
+               <span class="dt">targetDirectory =</span> <span class="kw">file.path</span>(<span class="kw">getwd</span>(), <span class="st">&quot;example1&quot;</span>))</code></pre>
+<p>The resulting pipeline file, <a href="example1/simpleGraph/pipeline.xml" class="uri">example1/simpleGraph/pipeline.xml</a>, contains the following XML:</p>
+<pre><code>## &lt;?xml version=&quot;1.0&quot;?&gt;
+## &lt;pipeline xmlns=&quot;http://www.openapi.org/2014/&quot;&gt;
+##   &lt;description&gt;This pipeline creates a directed graphNEL graph, lays it out using the Rgraphviz package, and then plots the graph as a PNG file using the gridGraphviz package&lt;/description&gt;
+##   &lt;component name=&quot;createGraph&quot; ref=&quot;createGraph.xml&quot; type=&quot;module&quot;/&gt;
+##   &lt;component name=&quot;layoutGraph&quot; ref=&quot;layoutGraph.xml&quot; type=&quot;module&quot;/&gt;
+##   &lt;component name=&quot;plotGraph&quot; ref=&quot;plotGraph.xml&quot; type=&quot;module&quot;/&gt;
+##   &lt;pipe&gt;
+##     &lt;start component=&quot;createGraph&quot; output=&quot;directedGraph&quot;/&gt;
+##     &lt;end component=&quot;layoutGraph&quot; input=&quot;myGraph&quot;/&gt;
+##   &lt;/pipe&gt;
+##   &lt;pipe&gt;
+##     &lt;start component=&quot;layoutGraph&quot; output=&quot;Ragraph&quot;/&gt;
+##     &lt;end component=&quot;plotGraph&quot; input=&quot;Ragraph&quot;/&gt;
+##   &lt;/pipe&gt;
+## &lt;/pipeline&gt;</code></pre>
+<p>The component XML files can be seen at:</p>
+<ul>
+<li><a href="example1/simpleGraph/createGraph.xml" class="uri">example1/simpleGraph/createGraph.xml</a></li>
+<li><a href="example1/simpleGraph/layoutGraph.xml" class="uri">example1/simpleGraph/layoutGraph.xml</a></li>
+<li><a href="example1/simpleGraph/plotGraph.xml" class="uri">example1/simpleGraph/plotGraph.xml</a></li>
+</ul>
 <hr />
 <p><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Guide to using conduit</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://canadia.co.nz/" property="cc:attributionName" rel="cc:attributionURL">Ashley Noel Hinton</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.</p>
 <div class="references">
