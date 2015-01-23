@@ -46,7 +46,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><a href="#run-a-pipeline-in-conduit">Run a pipeline in conduit</a></li>
 </ul></li>
 <li><a href="#searching-for-files-in-conduit">Searching for files in conduit</a></li>
-<li><a href="#internal-inputs-and-outputs-in-conduit">Internal inputs and outputs in conduit</a></li>
+<li><a href="#outputs-in-conduit">Outputs in <em>conduit</em></a></li>
 <li><a href="#modules">modules</a><ul>
 <li><a href="#loading-modules-from-xml">Loading modules from XML</a><ul>
 <li><a href="#loadmodule"><code>loadModule()</code></a></li>
@@ -138,8 +138,10 @@ simpleGraph &lt;-<span class="st"> </span>
 <p>The following example will attemp to load a module by searching for a file named in <code>ref</code> in the paths listed in <code>path</code>, and then the default search paths.</p>
 <pre class="sourceCode r"><code class="sourceCode r">mod1 &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="dt">name =</span> <span class="st">&quot;loader&quot;</span>, <span class="dt">ref =</span> <span class="st">&quot;arrangeLines.xml&quot;</span>,
                    <span class="dt">path =</span> <span class="st">&quot;~/openapi|/media/ashley/floppyDisk|&quot;</span>)</code></pre>
-<h2 id="internal-inputs-and-outputs-in-conduit">Internal inputs and outputs in conduit</h2>
-<p>FIXME: write explanations of file types</p>
+<h2 id="outputs-in-conduit">Outputs in <em>conduit</em></h2>
+<p>When a module's source code is executed in <em>conduit</em> by the <a href="#runmodule"><code>runModule()</code></a> function, the module's outputs are saved to disk in a directory with the same name as the module.</p>
+<p>Internal outputs are saved to disk by serializing objects in a file format relevant to the platform used. For example, imagine a module source script for the &quot;R&quot; platform creates an object, <code>finalData.df</code>. To mark this object as a module output the module must contain an internal output, named &quot;finalData.df&quot;. When the module's source script is executed <em>conduit</em> will produce a file named &quot;finalData.df.rds&quot; in the module's output directory; the file extension &quot;.rds&quot; is used for serializing R objects. Similarly, internal outputs from source scripts for the &quot;python&quot; platform will be serialized to a file with the file extension &quot;.pickle&quot;.</p>
+<p>External outputs should be easy to identify, as they will be explicitly named in the module's source script.</p>
 <h2 id="modules">modules</h2>
 <p>This sections describes how to: load modules from XML files; create modules; execute module source scripts; save modules as module XML files.</p>
 <h3 id="loading-modules-from-xml">Loading modules from XML</h3>

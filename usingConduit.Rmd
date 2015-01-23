@@ -135,10 +135,26 @@ mod1 <- loadModule(name = "loader", ref = "arrangeLines.xml",
 ```
 
 
-Internal inputs and outputs in conduit
---------------------------------------
+Outputs in *conduit*
+--------------------
 
-FIXME: write explanations of file types
+When a module's source code is executed in *conduit* by the
+[`runModule()`](#runmodule) function, the module's outputs are saved
+to disk in a directory with the same name as the module.
+
+Internal outputs are saved to disk by serializing objects in a file
+format relevant to the platform used. For example, imagine a module
+source script for the "R" platform creates an object,
+`finalData.df`. To mark this object as a module output the module must
+contain an internal output, named "finalData.df". When the module's
+source script is executed *conduit* will produce a file named
+"finalData.df.rds" in the module's output directory; the file
+extension ".rds" is used for serializing R objects. Similarly,
+internal outputs from source scripts for the "python" platform will be
+serialized to a file with the file extension ".pickle".
+
+External outputs should be easy to identify, as they will be
+explicitly named in the module's source script. 
 
 
 modules
