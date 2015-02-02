@@ -16,9 +16,10 @@ Quick start: running a pipeline
 
 conduit is an R package built using R version 3.1.x on a 64-bit Linux
 machine. It requires the following R packages: 'XML', 'graph', 'RBGL',
-'RCurl', and 'tools'. The 'devtools' package is required to install
-conduit directly from github. The 'Rgraphviz' and 'gridGraphviz'
-packages are required to run the modules in this example.
+and 'RCurl'. The 'devtools' package is required to
+install conduit directly from github. The 'Rgraphviz' and
+'gridGraphviz' packages are required to run the modules in this
+example.
 
 Version 0.1 of the packages, built 2015-02-08, is [available for
 download](conduit_0.1-0.tar.gz).
