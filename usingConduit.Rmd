@@ -109,7 +109,9 @@ provide the option to search for a resource.
 
 If the value of `ref` is an absolute resource address, e.g. a full
 file path, then no further searching will be done. Relative file paths
-can also be provided to `ref` arguments.
+can also be provided to `ref` arguments. <span class="ann">TODO:
+provide precise definition explaining to which location a relative ref
+is relative.</span>
 
 ```{r echo=FALSE}
 pathSep <- conduit:::pathSep
@@ -227,7 +229,6 @@ Optional arguments:
   + `inputs`: a list of [`moduleInput`](#moduleinput) objects
   + `outputs`: a list of [`moduleOutput`](#moduleoutput) objects
   + `sources`: a list of [`moduleSource`](#modulesource) objects
-  + `path`: search path to be used by module's source(s)
 
 Examples:
 ```{r moduleFunctionExample, eval=FALSE}
@@ -453,10 +454,6 @@ can also be provided:
      - `modules`: a list of `module` objects.
      - `pipelines`: a list of `pipeline` objects.
   + `pipes`: a list of `pipe` objects.
-
-It is also possible to set the search path(s) for a pipeline using the
-`path` argument. This can be used to set search path(s) for a module's
-components for which no path is provided.
 
 Example:
 
