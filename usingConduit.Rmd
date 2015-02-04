@@ -1,4 +1,4 @@
-% Guide to using conduit
+% Guide to using *conduit*
 % Ashley Noel Hinton
 
 ```{r setup, include=FALSE, cache=FALSE}
@@ -9,33 +9,48 @@ knitr::opts_chunk$set(cache=TRUE)
 library(conduit)
 ```
 
+The *openapi* project is an attempt to make it easier to connect
+people with data. The *openapi* architecture uses an XML scheme to
+describe modules of discrete data analaysis and exploration steps,
+which can be arranged in pipelines to describe data workflows. Both
+modules and pipelines can be shared, modified, and rearranged to suit
+the user's requirements. Modules and pipelines are exected in an
+*openapi* glue system. *conduit* is a prototype glue system which has
+been written as a package for the R programming environment. More
+information on the *openapi* project can be found in the University of
+Auckland Department of Statistics technical report, [Introducing
+*openapi*][introducingOpenapi].
+
+
 Quick start: running a pipeline
 -------------------------------
 
-### Installing conduit
+### Installing *conduit*
 
-conduit is an R package built using R version 3.1.x on a 64-bit Linux
-machine. It requires the following R packages: 'XML', 'graph', 'RBGL',
-and 'RCurl'. The 'devtools' package is required to
-install conduit directly from github. The 'Rgraphviz' and
-'gridGraphviz' packages are required to run the modules in this
-example.
+*conduit* is an R package built using R version 3.1.x on a 64-bit
+Linux machine. It requires the following R packages:
+[*XML*][xml-package], [*graph*][graph-package],
+[*RBGL*][RBGL-package], and [*RCurl*][RCURL-package]. The
+[*devtools*][devtools-package] is required to install *conduit*
+directly from github. The [*Rgraphviz*][Rgraphviz-package] and
+[*gridGraphviz*][gridGraphviz-package] packages are required to run
+the modules in this quick start example.
 
-Version 0.1 of the packages, built 2015-02-08, is [available for
+Version 0.1 of the *conduit*, built 2015-02-08, is [available for
 download](conduit_0.1-0.tar.gz).
 
-Source code for conduit is available at
+Source code for *conduit* is available at
 <https://github.com/anhinton/conduit> for those who would like to
 build and install the package manually.
 
-To install conduit using 'devtools':
+To install *conduit* using *devtools*:
 
 ```{r installConduitFake, eval=FALSE}
 install.packages("devtools")
 devtools::install_github("anhinton/conduit")
 ```
 
-Load the conduit package:
+Load the *conduit* package:
 
 ```{r loadConduitFake, eval=FALSE}
 library(conduit)
@@ -44,13 +59,15 @@ library(conduit)
 ### Reading a pipeline from an XML file
 
 The `loadPipeline()` function is used to read a pipeline XML file into
-conduit.  `loadPipeline()` requires a `name` argument, and a `ref`
+*conduit*.  `loadPipeline()` requires a `name` argument, and a `ref`
 argument which describes the XML file location The function returns a
 `pipeline` object.
 
-We will load our the pipeline used in out pipelines example above. The
-pipeline XML file is in a sub-directory of the R working directory
-called 'simpleGraph'.
+We will load a pipeline which creates and plots a simple node-and-edge
+graph. oThe pipeline XML file is in a sub-directory of the R working
+directory called 'simpleGraph'.
+
+<span class="ann">TODO: better describe pipeline example</span>
 
 ```{r loadPipelineFalse}
 ## load the simpleGraph pipeline
@@ -66,7 +83,7 @@ desc <-simpleGraph$description
 
     `r desc`
 
-### Run a pipeline in conduit
+### Run a pipeline in *conduit*
 
 The `runPipeline()` function is used to run a `pipeline` object in
 R. It requires a `pipeline` object as its only argument. This function
@@ -99,68 +116,21 @@ below:
 
 ![Pipeline output: PNG image file of graph](`r pipeline_files[exampleGraph]`)
 
+---
 
-Searching for files in conduit
-------------------------------
+The remainder of this document goes into greater detail about how to
+create execute *openapi* [modules](#modules) and
+[pipelines](#pipelines) using *conduit*. Following these is a
+discussion on [how to search for files in
+*conduit*](#searching-for-files-in-conduit), and about the [outputs
+produced by *conduit*](#outputs-in-conduit). To finish there are two
+fully worked examples: how to create a pipeline containing modules
+with [R script files for
+sources](#example-creating-a-pipeline-from-r-scripts), and how to
+create a pipeline which uses both [R scripts and python
+scripts](#example-combining-r-and-python-scripts).
 
-conduit allows the user to either specify the location of a resource
-file, or to provide a filename and file location(s) where the file
-should be found.  Functions which have `ref` and `path` arguments
-provide the option to search for a resource.
-
-If the value of `ref` is an absolute resource address, e.g. a full
-file path, then no further searching will be done. Relative file paths
-can also be provided to `ref` arguments. <span class="ann">TODO:
-provide precise definition explaining to which location a relative ref
-is relative.</span>
-
-```{r echo=FALSE}
-pathSep <- conduit:::pathSep
-```
-
-If no resource can be sensibly found at `ref`, a search is
-started. Conduit will search by default in the directory for the
-module or pipeline which initiated the search, then R's current
-working directory. The default search paths can be amended or replaced
-by the `path` argument. Search paths are given as character strings, with
-each path divided by the '`r pathSep`' character. Values for `path`
-which end in '`r pathSep`' will be prepended to the default search paths, and
-those which beging with '`r pathSep`' will be appended.
-
-conduit will search in each search path provided until a matching file
-is located. The first match will be returned.
-
-The following example will attemp to load a module by searching for a file named in `ref` in the paths listed in `path`, and then the default search paths.
-
-```{r searchExample, eval=FALSE}
-mod1 <- loadModule(name = "loader", ref = "arrangeLines.xml",
-                   path = "~/openapi|/media/ashley/floppyDisk|")
-```
-
-
-Outputs in *conduit*
---------------------
-
-When a module's source code is executed in *conduit* by the
-[`runModule()`](#runmodule) function, the module's outputs are saved
-to disk in a directory with the same name as the module.
-
-Internal outputs are saved to disk by serializing objects in a file
-format relevant to the platform used. For example, imagine a module
-source script for the "R" platform creates an object,
-`finalData.df`. To mark this object as a module output the module must
-contain an internal output, named "finalData.df". When the module's
-source script is executed *conduit* will produce a file named
-"finalData.df.rds" in the module's output directory; the file
-extension ".rds" is used for serializing R objects. Similarly,
-internal outputs from source scripts for the "python" platform will be
-serialized to a file with the file extension ".pickle".
-
-External outputs should be easy to identify, as they will be
-explicitly named in the module's source script. 
-
-
-modules
+Modules
 -------
 
 This sections describes how to: load modules from XML files; create
@@ -192,9 +162,9 @@ plotGraph <- loadModule(name = "plotGraph",
 
 ### Creating modules
 
-Modules can be created in conduit using the `module()` function and
+Modules can be created in *conduit* using the `module()` function and
 its associated helper functions. The resulting modules can be executed
-in conduit, or saved to disk as module XML files.
+in *conduit*, or saved to disk as module XML files.
 
 The following example shows how a module can be created.
 
@@ -268,7 +238,7 @@ inp2 <- moduleInput(name = "boothLatLong", type = "external",
 The `moduleOutput()` function is used to create the outputs for
 modules created in R with the `module()` function. Each "internal"
 output should correspond to an object of the same name in the module's
-source(s). "external" outputs are not produced by conduit, but are
+source(s). "external" outputs are not produced by *conduit*, but are
 produced directly by the module source script(s). It is recommended
 that an "external" output have the same `name` and `ref`, though this
 is not compulsory. `moduleOutput()` requires the following arguments:
@@ -404,7 +374,7 @@ saveModule(module = layoutGraph, targetDirectory = tempTarget)
 ```
 
 
-pipelines
+Pipelines
 ---------
 
 This sections describes how to: load pipelines from XML files; create
@@ -441,7 +411,7 @@ simpleGraph <- loadPipeline(name = "simpleGraph",
 
 Pipelines can be created using the `pipeline()` function, and its
 associated helper functions. The resulting `pipeline` objects can be
-executed using conduit, or saved to disk as XML files.
+executed using *conduit*, or saved to disk as XML files.
 
 #### `pipeline()`
 
@@ -668,6 +638,66 @@ The resulting XML files can be found at:
   + [layoutGraph.xml](exportPipeline/graphExport/layoutGraph.xml)
 
 
+Searching for files in *conduit*
+------------------------------
+
+*conduit* allows the user to either specify the location of a resource
+file, or to provide a filename and file location(s) where the file
+should be found.  Functions which have `ref` and `path` arguments
+provide the option to search for a resource.
+
+If the value of `ref` is an absolute resource address, e.g. a full
+file path, then no further searching will be done. Relative file paths
+can also be provided to `ref` arguments. <span class="ann">TODO:
+provide precise definition explaining to which location a relative ref
+is relative.</span>
+
+```{r echo=FALSE}
+pathSep <- conduit:::pathSep
+```
+
+If no resource can be sensibly found at `ref`, a search is
+started. *Conduit* will search by default in the directory for the
+module or pipeline which initiated the search, then R's current
+working directory. The default search paths can be amended or replaced
+by the `path` argument. Search paths are given as character strings, with
+each path divided by the '`r pathSep`' character. Values for `path`
+which end in '`r pathSep`' will be prepended to the default search paths, and
+those which beging with '`r pathSep`' will be appended.
+
+*conduit* will search in each search path provided until a matching file
+is located. The first match will be returned.
+
+The following example will attemp to load a module by searching for a file named in `ref` in the paths listed in `path`, and then the default search paths.
+
+```{r searchExample, eval=FALSE}
+mod1 <- loadModule(name = "loader", ref = "arrangeLines.xml",
+                   path = "~/openapi|/media/ashley/floppyDisk|")
+```
+
+
+Outputs in *conduit*
+--------------------
+
+When a module's source code is executed in *conduit* by the
+[`runModule()`](#runmodule) function, the module's outputs are saved
+to disk in a directory with the same name as the module.
+
+Internal outputs are saved to disk by serializing objects in a file
+format relevant to the platform used. For example, imagine a module
+source script for the "R" platform creates an object,
+`finalData.df`. To mark this object as a module output the module must
+contain an internal output, named "finalData.df". When the module's
+source script is executed *conduit* will produce a file named
+"finalData.df.rds" in the module's output directory; the file
+extension ".rds" is used for serializing R objects. Similarly,
+internal outputs from source scripts for the "python" platform will be
+serialized to a file with the file extension ".pickle".
+
+External outputs should be easy to identify, as they will be
+explicitly named in the module's source script. 
+
+
 Example: creating a pipeline from R scripts
 -------
 
@@ -678,6 +708,8 @@ pipeline's modules will be executed on the "R" platform. The first
 module creates a graphNEL object; the second module will use this
 "graphNEL" object to create an "Ragraph" object; the last module will
 produce a PNG image of the "Ragraph" object.
+
+<span class="ann">TODO: make mention of packages used</spa>
 
 ### R scripts
 
@@ -882,6 +914,40 @@ The component XML files can be seen at:
   + [example1/simpleGraph/layoutGraph.xml](example1/simpleGraph/layoutGraph.xml)
   + [example1/simpleGraph/plotGraph.xml](example1/simpleGraph/plotGraph.xml)
 
+Example: combining R and python scripts
+---------------------------------------
+
+<span class="ann">TODO: write an example combining R and python scripts</span>
+
 ----
 
-<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Guide to using conduit</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://canadia.co.nz/" property="cc:attributionName" rel="cc:attributionURL">Ashley Noel Hinton</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Guide to using *conduit*</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://canadia.co.nz/" property="cc:attributionName" rel="cc:attributionURL">Ashley Noel Hinton</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+
+----
+
+References
+----------
+
+[introducingOpenapi]: https://www.stat.auckland.ac.nz/~paul/Reports/introducingOpenapi/introducingOpenapi.html
+[xml-package]: http://www.omegahat.org/RSXML "XML: Tools for parsing and
+	       generating XML within R and S-Plus"
+[graph-package]: http://bioconductor.org/packages/release/bioc/html/graph.html
+		"graph: A package to handle graph data structures"
+[RBGL-package]: http://bioconductor.org/packages/release/bioc/html/RBGL.html
+	       "RBGL: An interface to the BOOST graph library"
+[RCURL-package]: http://www.omegahat.org/RCurl "RCurl: General network
+		(HTTP/FTP/...) client interface for R"
+[devtools-package]: http://cran.r-project.org/web/packages/devtools/index.html
+		    "devtools: Tools to make developing R code easier"
+[Rgraphviz-package]: http://bioconductor.org/packages/release/bioc/html/Rgraphviz.html
+		     "Rgraphviz: Provides plotting capabilities for R graph
+		     objects"
+[gridGraphviz-package]: http://r-forge.r-project.org/R/?group_id=1272
+			"gridGraphviz: Drawing Graphs with Grid"
+
+---
+nocite: |
+  @rproject, @conduit-package, @xml-package, @graph-package,
+  @RBGL-package, @RCurl-package, @devtools-package, @Rgraphviz-package,
+  @gridGraphviz-package, @introducingOpenapi
+---

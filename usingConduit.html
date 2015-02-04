@@ -35,54 +35,30 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <body>
 <div class="main">
 <div id="header">
-<h1 class="title">Guide to using conduit</h1>
+<h1 class="title">Guide to using <em>conduit</em></h1>
 <h2 class="author">Ashley Noel Hinton</h2>
 </div>
 <div id="TOC">
 <ul>
 <li><a href="#quick-start-running-a-pipeline">Quick start: running a pipeline</a><ul>
-<li><a href="#installing-conduit">Installing conduit</a></li>
+<li><a href="#installing-conduit">Installing <em>conduit</em></a></li>
 <li><a href="#reading-a-pipeline-from-an-xml-file">Reading a pipeline from an XML file</a></li>
-<li><a href="#run-a-pipeline-in-conduit">Run a pipeline in conduit</a></li>
+<li><a href="#run-a-pipeline-in-conduit">Run a pipeline in <em>conduit</em></a></li>
 </ul></li>
-<li><a href="#searching-for-files-in-conduit">Searching for files in conduit</a></li>
+<li><a href="#modules">Modules</a><ul>
+<li><a href="#loading-modules-from-xml">Loading modules from XML</a></li>
+<li><a href="#creating-modules">Creating modules</a></li>
+<li><a href="#executing-module-scripts">Executing module scripts</a></li>
+<li><a href="#saving-modules-as-xml-files">Saving modules as XML files</a></li>
+</ul></li>
+<li><a href="#pipelines">Pipelines</a><ul>
+<li><a href="#loading-pipelines-from-xml">Loading pipelines from XML</a></li>
+<li><a href="#creating-pipelines">Creating pipelines</a></li>
+<li><a href="#executing-pipeline-components">Executing pipeline components</a></li>
+<li><a href="#saving-and-exporting-pipelines-as-xml-files">Saving and exporting pipelines as XML files</a></li>
+</ul></li>
+<li><a href="#searching-for-files-in-conduit">Searching for files in <em>conduit</em></a></li>
 <li><a href="#outputs-in-conduit">Outputs in <em>conduit</em></a></li>
-<li><a href="#modules">modules</a><ul>
-<li><a href="#loading-modules-from-xml">Loading modules from XML</a><ul>
-<li><a href="#loadmodule"><code>loadModule()</code></a></li>
-</ul></li>
-<li><a href="#creating-modules">Creating modules</a><ul>
-<li><a href="#module"><code>module()</code></a></li>
-<li><a href="#moduleinput"><code>moduleInput()</code></a></li>
-<li><a href="#moduleoutput"><code>moduleOutput()</code></a></li>
-<li><a href="#modulesource"><code>moduleSource()</code></a></li>
-</ul></li>
-<li><a href="#executing-module-scripts">Executing module scripts</a><ul>
-<li><a href="#runmodule"><code>runModule()</code></a></li>
-</ul></li>
-<li><a href="#saving-modules-as-xml-files">Saving modules as XML files</a><ul>
-<li><a href="#savemodule"><code>saveModule()</code></a></li>
-</ul></li>
-</ul></li>
-<li><a href="#pipelines">pipelines</a><ul>
-<li><a href="#loading-pipelines-from-xml">Loading pipelines from XML</a><ul>
-<li><a href="#loadpipeline"><code>loadPipeline()</code></a></li>
-</ul></li>
-<li><a href="#creating-pipelines">Creating pipelines</a><ul>
-<li><a href="#pipeline"><code>pipeline()</code></a></li>
-<li><a href="#addcomponent"><code>addComponent()</code></a></li>
-<li><a href="#pipe"><code>pipe()</code></a></li>
-<li><a href="#addpipe"><code>addPipe()</code></a></li>
-</ul></li>
-<li><a href="#executing-pipeline-components">Executing pipeline components</a><ul>
-<li><a href="#runpipeline"><code>runPipeline()</code></a></li>
-<li><a href="#runcomponent"><code>runComponent()</code></a></li>
-</ul></li>
-<li><a href="#saving-and-exporting-pipelines-as-xml-files">Saving and exporting pipelines as XML files</a><ul>
-<li><a href="#savepipeline"><code>savePipeline()</code></a></li>
-<li><a href="#exportpipeline"><code>exportPipeline()</code></a></li>
-</ul></li>
-</ul></li>
 <li><a href="#example-creating-a-pipeline-from-r-scripts">Example: creating a pipeline from R scripts</a><ul>
 <li><a href="#r-scripts">R scripts</a></li>
 <li><a href="#creating-the-first-module-creategraph">Creating the first module: <code>createGraph</code></a></li>
@@ -92,27 +68,30 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li><a href="#creating-the-simplegraph-pipeline">Creating the <code>simpleGraph</code> pipeline</a></li>
 <li><a href="#exporting-the-simplegraph-pipeline-to-xml">Exporting the <code>simpleGraph</code> pipeline to XML</a></li>
 </ul></li>
+<li><a href="#example-combining-r-and-python-scripts">Example: combining R and python scripts</a></li>
 </ul>
 </div>
+<p>The <em>openapi</em> project is an attempt to make it easier to connect people with data. The <em>openapi</em> architecture uses an XML scheme to describe modules of discrete data analaysis and exploration steps, which can be arranged in pipelines to describe data workflows. Both modules and pipelines can be shared, modified, and rearranged to suit the user's requirements. Modules and pipelines are exected in an <em>openapi</em> glue system. <em>conduit</em> is a prototype glue system which has been written as a package for the R programming environment. More information on the <em>openapi</em> project can be found in the University of Auckland Department of Statistics technical report, <a href="https://www.stat.auckland.ac.nz/~paul/Reports/introducingOpenapi/introducingOpenapi.html">Introducing <em>openapi</em></a>.</p>
 <h2 id="quick-start-running-a-pipeline">Quick start: running a pipeline</h2>
-<h3 id="installing-conduit">Installing conduit</h3>
-<p>conduit is an R package built using R version 3.1.x on a 64-bit Linux machine. It requires the following R packages: 'XML', 'graph', 'RBGL', 'RCurl', and 'tools'. The 'devtools' package is required to install conduit directly from github. The 'Rgraphviz' and 'gridGraphviz' packages are required to run the modules in this example.</p>
-<p>Version 0.1 of the packages, built 2015-02-08, is <a href="conduit_0.1-0.tar.gz">available for download</a>.</p>
-<p>Source code for conduit is available at <a href="https://github.com/anhinton/conduit" class="uri">https://github.com/anhinton/conduit</a> for those who would like to build and install the package manually.</p>
-<p>To install conduit using 'devtools':</p>
+<h3 id="installing-conduit">Installing <em>conduit</em></h3>
+<p><em>conduit</em> is an R package built using R version 3.1.x on a 64-bit Linux machine. It requires the following R packages: <a href="http://www.omegahat.org/RSXML" title="XML: Tools for parsing and generating XML within R and S-Plus"><em>XML</em></a>, <a href="http://bioconductor.org/packages/release/bioc/html/graph.html" title="graph: A package to handle graph data structures"><em>graph</em></a>, <a href="http://bioconductor.org/packages/release/bioc/html/RBGL.html" title="RBGL: An interface to the BOOST graph library"><em>RBGL</em></a>, and <a href="http://www.omegahat.org/RCurl" title="RCurl: General network (HTTP/FTP/...) client interface for R"><em>RCurl</em></a>. The <a href="http://cran.r-project.org/web/packages/devtools/index.html" title="devtools: Tools to make developing R code easier"><em>devtools</em></a> is required to install <em>conduit</em> directly from github. The <a href="http://bioconductor.org/packages/release/bioc/html/Rgraphviz.html" title="Rgraphviz: Provides plotting capabilities for R graph objects"><em>Rgraphviz</em></a> and <a href="http://r-forge.r-project.org/R/?group_id=1272" title="gridGraphviz: Drawing Graphs with Grid"><em>gridGraphviz</em></a> packages are required to run the modules in this quick start example.</p>
+<p>Version 0.1 of the <em>conduit</em>, built 2015-02-08, is <a href="conduit_0.1-0.tar.gz">available for download</a>.</p>
+<p>Source code for <em>conduit</em> is available at <a href="https://github.com/anhinton/conduit" class="uri">https://github.com/anhinton/conduit</a> for those who would like to build and install the package manually.</p>
+<p>To install <em>conduit</em> using <em>devtools</em>:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;devtools&quot;</span>)
 devtools::<span class="kw">install_github</span>(<span class="st">&quot;anhinton/conduit&quot;</span>)</code></pre>
-<p>Load the conduit package:</p>
+<p>Load the <em>conduit</em> package:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(conduit)</code></pre>
 <h3 id="reading-a-pipeline-from-an-xml-file">Reading a pipeline from an XML file</h3>
-<p>The <code>loadPipeline()</code> function is used to read a pipeline XML file into conduit. <code>loadPipeline()</code> requires a <code>name</code> argument, and a <code>ref</code> argument which describes the XML file location The function returns a <code>pipeline</code> object.</p>
-<p>We will load our the pipeline used in out pipelines example above. The pipeline XML file is in a sub-directory of the R working directory called 'simpleGraph'.</p>
+<p>The <code>loadPipeline()</code> function is used to read a pipeline XML file into <em>conduit</em>. <code>loadPipeline()</code> requires a <code>name</code> argument, and a <code>ref</code> argument which describes the XML file location The function returns a <code>pipeline</code> object.</p>
+<p>We will load a pipeline which creates and plots a simple node-and-edge graph. oThe pipeline XML file is in a sub-directory of the R working directory called 'simpleGraph'.</p>
+<p><span class="ann">TODO: better describe pipeline example</span></p>
 <pre class="sourceCode r"><code class="sourceCode r">## load the simpleGraph pipeline
 simpleGraph &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">loadPipeline</span>(<span class="dt">name =</span> <span class="st">&quot;simpleGraph&quot;</span>, <span class="dt">ref=</span><span class="st">&quot;simpleGraph/pipeline.xml&quot;</span>)</code></pre>
 <p>According to its <code>description</code>:</p>
 <pre><code>This pipeline creates a directed graphNEL graph, lays it out using the Rgraphviz package, and then plots the graph as a PNG file using the gridGraphviz package</code></pre>
-<h3 id="run-a-pipeline-in-conduit">Run a pipeline in conduit</h3>
+<h3 id="run-a-pipeline-in-conduit">Run a pipeline in <em>conduit</em></h3>
 <p>The <code>runPipeline()</code> function is used to run a <code>pipeline</code> object in R. It requires a <code>pipeline</code> object as its only argument. This function will create a directory for the pipeline in the 'pipelines' sub-directory of the current working directory. If a 'pipelines' sub-directory does not exist it will be created. Each module in the pipeline will create output in a named directory found in ./pipelines/PIPELINE_NAME/modules.</p>
 <pre class="sourceCode r"><code class="sourceCode r">## run the simpleGraph pipeline
 <span class="kw">runPipeline</span>(simpleGraph)</code></pre>
@@ -130,19 +109,9 @@ simpleGraph &lt;-<span class="st"> </span>
 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAeAAAAHgCAMAAABKCk6nAAAC2VBMVEUAAAABAQECAgIDAwMEBAQFBQUICAgJCQkKCgoLCwsMDAwNDQ0ODg4PDw8QEBARERESEhITExMUFBQVFRUWFhYYGBgZGRkaGhobGxscHBwfHx8gICAhISEiIiIjIyMlJSUoKCgpKSksLCwuLi4vLy8xMTEyMjIzMzM0NDQ1NTU2NjY3Nzc4ODg5OTk6Ojo7Ozs8PDw9PT0+Pj4/Pz9AQEBBQUFCQkJDQ0NERERFRUVGRkZHR0dISEhJSUlKSkpLS0tMTExNTU1OTk5PT09QUFBRUVFSUlJTU1NUVFRVVVVWVlZXV1dYWFhZWVlaWlpbW1tcXFxdXV1eXl5fX19gYGBhYWFiYmJjY2NkZGRlZWVmZmZnZ2doaGhpaWlqampra2tsbGxtbW1ubm5vb29wcHBxcXFycnJzc3N0dHR1dXV2dnZ3d3d4eHh5eXl6enp7e3t8fHx9fX1+fn5/f3+AgICCgoKDg4OEhISFhYWGhoaHh4eIiIiJiYmKioqLi4uMjIyNjY2Ojo6Pj4+QkJCRkZGSkpKTk5OUlJSVlZWWlpaXl5eYmJiZmZmampqbm5ucnJydnZ2enp6fn5+goKChoaGioqKjo6OkpKSlpaWmpqanp6eoqKipqamqqqqrq6usrKytra2urq6vr6+wsLCxsbGysrKzs7O0tLS1tbW2tra3t7e4uLi5ubm6urq7u7u8vLy9vb2+vr6/v7/AwMDBwcHCwsLDw8PExMTFxcXGxsbHx8fIyMjJycnKysrLy8vMzMzNzc3Ozs7Pz8/Q0NDR0dHS0tLT09PU1NTV1dXW1tbX19fY2NjZ2dna2trb29vc3Nzd3d3e3t7f39/g4ODh4eHi4uLj4+Pk5OTl5eXm5ubn5+fo6Ojp6enq6urr6+vs7Ozt7e3u7u7v7+/w8PDx8fHy8vLz8/P09PT19fX29vb39/f4+Pj5+fn6+vr7+/v8/Pz9/f3+/v7///9b1XGWAAAXIElEQVR4nO3d939U9Z7Hcbbcsveuu+uW6+7eulUgyUwymcwkEG5CuEQiHQEhSEkgcjEKAi6iAUITFZBqQQHpTVAw1ERqaBGkGkAIEFoaaTPnL1iKJSanfD7fc77nnOHxfv7gfTDzPTOfx309CJOZc77TSoFHWiunBwC5EPgRh8CPOAQ24dzC51MDwcTEYDBpwJTCBqfHUYXAoo48H9V9/oGKh39oOL02x5u+us7ZkdQgsJDQiuDA7aFmN56fGPfKDUfG0YHAItZ7Xrmpdnt4Vdy4aruH0YfAfKUdMzX/ooYXtl5v5yyGEJhtU+tCvbtvZIyst2sUAgTmer2z6k/nJmYlGa2wEQLzhLJGNn9t1dI27wUbRqFBYJ7BkymrjkaXyR6ECoFZxr9AW1fkrZA7CBkCc6x5OkxcubKr1EHoEJjhXHwNee3LsyQOwoDADGlH6WsbAqXyBmFAYLqlYzirj6fLmoMFgcnqvZWs9UMK5MzBg8Bks9/grS8LyJmDB4GpQlFVzCMyd0kZhAeBqba8yD2ipLeMOZgQmKr3V+xDfLx/tKVAYKLGWP4xk1ZbPwcXAhMVjeQfUzzU+jm4EJgobx3/mJDP8jHYEJio2zcCByXdtXwOLgQmihc5aHCJ1WOwITCRT+SgfOfPz0JgmpBf445DsT//h+5aH/4ufE/WPGQITFOZqnHH7zvtWvO7CRp3Ln9L1jxkCExTrvHZUN2Eey++Bj6rcdTaadIGokJgmrp2GnfUFuR3+alW4PffkTUPGQITabyKvvPk/074fJBW4LeXSpuHCoGJ4tRvXvVESFGe1gr88g5p81AhMFGy+jVHW1ot3D/uJ3EaZ8l2uSpxIhoEJso6rHpzOOfvnsje+29z1A/yyZuHCoGJls7kH3O9o/VzcCEw0dXO/GNWTLV+Di4Epornf3Dw7DEJczAhMNW0j7hHVAt9QGExBKb6phP3iGVTZMzBhMBkPQ/w1oe8t+UMwoLAZMXdeOvXjZIzBw8C02Xobt3QXF2MK64RRmC6K17O5hsT5kkbhAOBGd6cSF9bkmS81YMdEJijx1bqyoqYSzIHoUNgjnLPIdrCUHcXnPP+AAJz1KT8jnT2bPiZubJHoUJghvPeTXtjCT96Q8PHSZ+FCoHp9rfZryjHYk8aravtI/DJkywITLY8/sGP5wuJy/TXnQ265d/f+xCYKJQ97Nsdv+uy+pdrrwvP95+2ZyIaBKap6dVki7sdgTlaW38Xtc9301akCEx0Kbix6R8b5sXkXW+5qmFtUtYVu0YiQmCKbbHNf+zWLUjMWPGjU+pqd+VG5160cSgaBCZ4N/Gayq0X30x9MmPMexuLDuzeMntwnGd0IXWfQzshsKHGkf20/sWtP7lu+qujMsdNWrLPDZ/9qkFgI1cDBu9KTfmNPYOIQWADx6J3G6zw/7Pzp7drQ2B9m6ONdk+64k12/hpCbQisJ5z7lOFWVzNeHeazYRRRCKyjumue8Qtjf+GIPi44/1kLAmsrS1hsvOh4r+IRn7J3ObQPAms61IZykt3ozcUjQlGN0qcRhcBaFiWpvBnZwr22xSOUP38ufRxRCKyuMbtfLWXd9ueVe4GP9Jc9jzAEVlXZZQLtfceph5T9AxSll+R5xCGwmnNexmf2OzPkDWIeAqtYG8X5zP7ej2gXQ+AWwnnprK8tQ+DIUjdgeAPrAASOKKVe7t5WCBxJvogu5h6CwBFkcfxl9jEIHDHC459W3+5MFwJHilupQlcUIXCEONF2s9BxCBwZ1rPe3WgCgSPCnHaUD4/UIHAEqB8yVPiKEwR2vytB9jZ2P0Bg19vnZb+70QQCu93aRJFvNfseArtb+NX+pHM3NCGwq93uZHa/FAR2sxNxRlemGEJgF/u0nfkrehHYveY+dcf8gyCwW9X0JlyZYgyBXepy8kbjRQQI7E57A4Y7mtEgsCutTLZqv24EdqHw+IFa+26wIbD73EqzcDt2BHadL2NNv7vRBAK7zTq/pfuVIbDL5GVUWfp4COwqNT0seXejCQR2k9LYj61+SAR2kaIY9e95NgOB3WOpT8KX3SCwW4RG96iR8LAI7BI3U+R81w0Cu8PxmB1yHhiBXWF19BlJj4zAbjA95aash0Zg55F2FRWFwI4771ku8dER2GkFrY/IfHgEdtj7fv6+GxwI7KjQi8+YuzLFEAI7SXDfDQ4EdtAJ7y7pz4HAztmWeEH+kyCwYxZ2suP7yBDYIXWZ4235MkEEdkZZIndXUUEI7Ij9MYdseiYEdsJ6zzm7ngqB7RfK7XPXtidDYNtJ/fCoBQS2W2n8JjufDoFtdthnZlszPgS21+I/3rD3CRHYTo3Zw3jfmWIeAtvodkfpHx61gMD2KY1lfCWdVRDYNttiTjnwrAhslzfa2fzy6iEEtkd9ZrbdL68eQmBb3Emb4tAzI7AdSmJ2OvXUCGyDddKuPDKGwPK9lezIy6uHEFi2hiFDnHl59RACS1bmX+Do8yOwXIeetHLbOgEILNW2thbtCiwMgWXK61Th9AgILE99Znaj0zMgsDyVnSc5PYKCwEIaTm+aOz0v7+3Fu69pL7rgXWXfRNoQmKtofDBhwOSl6z/7bOW7YzK8Xedcab7i7P3/FLQ+bv9sKhCY5fpEz9BPfrTfb+mClLSVoaa3nE5W7m9LKPfCfTIEZrg8IrhG5ZuayyZ6FzV5NdX5sKL07yZjW0IRCEwWejP2U427Kl/zf3+t0ee9lMbBI208tV0fAlOdT8rXeU+5NH3sw3vD/ou3U1fYNBMBAhOt8hi8aHrr4Rc5r8y54C9UlFrJe6uQITDN7HTDr1LYH3VKUeqjtseUKMeG+w/aMRUBApNM6Uf4yO9UdIkyfZD/eJ4v90v5IxEhMMW8fqQXTaXRR38d1eWp5ZZ9bZkFEJhgYzrxI/uSx3820umPj5pBYGNnEsjXa3+Y5prfj76FwIZCiSX0xePsv/pIHwIbmvkGY3Eo+I20QYQgsJHrPtY5c7v6yRpEDAIbGb2Btz7jKzlzCEJgAzcDzAMO95ExhjAENjDtA+4RHXTOArAfAhvwsre0WjpVxhyiEFjfkb7sQ6r9EuYQhsD6XhM4sapzi5N4HITA+pJv8Y+Z+aH1cwhDYH1e9ZsLHtc5Zn+2lFHEILCuS13Vb9cNXJ0sZRYxCKyrYKzG7XqBlXgZowhCYF0fzlG/veDxFf/x913LNY5KkDYPHwLrmrtE/faCv/qvgq1/aKdxVDsXfeKPwLqmrVW/vaBVoaLsa3Ve/d50B7dsaA6Bdc36WP32gp+EFCX8N1vU7011/KLRHyCwrsUL1W9/EDj00+3q9/pddFoHAutarfG+ckGrPYqy+y813rLySZuHD4F1HXtO/faCn/9h84bf9lK/M+STNg8fAuuqTVK/veC/F//+HwdUq99Z2lveQGwIrC8uZLymuTWTrZ9DGALryxK4BGWYXd9qRoHA+lbk84+JdX7rlR8gsL4a/tuOhwdKmEMYAhvoe4x7xCjHtg5Wg8AGtg9nHlDtFXhdJg8CG0m8xFs/WePNL4cgsJH1vPMzKtq46KMkBYEJOu7lrM5y0f4c9yGwoZMJjF97itvLG0QIAhvLH09eWhVt21d7EyGwsXDnrdSVvddInUQAAhPc9hHffBw9Qe4gAhCY4koM6SL/yUNlD8KHwCSlsV8YrgmPHu6qtzgeQmCaG8kfGayo6uPUt9fpQmCi+hGDNT7ff+iIT+MMPIchMNkaj8Y5tPdUjUq7aOMoDAhMdycraZPq+ZK3J7VdZvcwVAjMUZrdeurV5jfue671fHe9/9wUAvPcWZCYOGHndxclNZ5dMTiq/w4XnQbdAgKzVWx46amEYDAxMRgI9J960IW/GjWFwKLeZX5O7BAEFpXjpnMntSGwKAS2AAKbhsCiENgCCGwaAotCYAsgsGkILAqBLYDApiGwKAS2AAKbhsCiENgCCGwaAotCYAsgsGkILAqBLYDApiGwKAS2AAKbhsCiENgCCGwaAotCYAsgsGkILAqBLYDApiGwKAS2AAKbhsCiENgCCGwaAotCYAsgsGkILAqBLYDApiGwKAS2AAKbhsCiENgCCGwaAotCYAsgsGkILAqBLYDApiGwKAS2AAKbhsCiENgCCGwaAotCYAsgsGkILAqBLYDApiGwKAS2AAKbhsCiENgCCGwaAotCYAsgsGkILAqBLYDApiGwKAS2AAKbhsCiENgCCGwaAotCYAsgsGkILAqBLYDApiGwKAS2AAKbhsCiENgCCGwaAotCYAsgsGkILAqBLYDApiGwkN2K0rFAqYmAxggsxF95/2/w4llOz2EMgYXMWnQ/cPsbTs9hDIGFXEu+F/j8n5wegwCBxXS6kHPo9Y+dnoIAgcUsm5RzyHPX6SkIEFjMXU/OhwOdHoICgQU926vnTqdnoEBgQQX/859hp2egQGBBocf6OT0CCQKzVWx46amEYPBfWwcDgf5TD4WcnkcfAvPcWZCUOGFn+bd/ajy7ckhU/x1u/lmNwByl2cHZLd69Ojwqbn6dE9OQIDDdnazk7ap31MyIWmbzLGQITLbas1bzvqpRaRdsHIUBgYlqBj1XrXf/Ee9qu0ZhQWCasriPDFZU9RpryyRMCEzydcwXhmvCo4e48FcmBKa4ElNCWTZ5qOxB+BCY4LaPeG7O6AlyBxGAwMbCnbdSV/ZeI3USAQhsLH88eWlV9DmJg4hAYEMnExrpiw+3lzeIEAQ2Ek46xVk+9j1Zg4hBYCPrX2Atr/a4631pBDYSYJ4bO+dtOXMIQmAD27n/B9V4XfV2BwIb6H6Ge8SYLTLmEIXA+m752Yec6CFhDmEIrG9pPv+YmAbr5xCGwPoGHeEfk1Nk/RzCEFhfnMArpjWTrZ9DGALrqhZ5Y+qSm/4RRmBdh4cJHBTmvzCTB4F1rZ4uchQCUzkeeNEijTvOd/jbX7+jdVTARSdKI7CuWRqXANf/tuf+eX+xR+Oo1EppA7EhsK5pGmfKfvxPtYoyZL7GUeku2toBgXW984H67f+n++o6qV7GLGIQWNeHc9RvH/tHvaPiZYwiCIF1FWic6/zBr+oUZcxrGkfFSZuHD4F1lWWo317zRJ8Dy36mcS5eRYq8gdgQWJ/WX8aTgV/8RuPHt7I/R9Y0AhBYX9o1/jFTVlo/hzAE1pe/nH9Miot+S0JgA0f6sg+p9Fk/hjgENhDHfldqkau2KEVgA9M03urQ1kHgn215ENhABfckyT3u2gAPgY2M3sBbn/GVnDkEIbCR67GsSxW2u2x/NAQ2NI9+caGi3I120+9ICgIThPyH6YtHzZU3iBAENnbFe5u6dBX/12bJEJhgYzrxVPaSqDtyJ+FDYIp5/UhnWZVGz+hZI3sWJgQmmdKP8Hf4VHSJsit4XvowLAhMMzu9ymjJ/qj7WwF86Ttgwzh0CEy0ynNcf8Fbid88+N/yDkttGIcMganOJ+Xr/JguTR/73b2N2ZkuurwQgclCb8ZqXdpd+Zq/6VZpUzq758RoBGa4PDywWuWM2LKJ3kU/3mlpXWypTSMZQmCW6xM9Qz750cutr+enpK1s8YHT6dgCu0YygMBcReOD/gGTl67/7LOV747J8D49+7LaqvIORtsP2wSBBTSc3jR3el7eW4t3a3+2Xz/kZVdcgobA0iz50y2nR1AQWKbCuBNOj4DAUp3x73J6BASWqurpPKdHQGCpwnmDHL6UFIElW9yJfLaAFAgs2x7fSSefHoGluxxY4eCzI7B8tc/kOrfDMALbIDym512nnhuBbbEh7muHnhmB7XHUs9eZJ0Zgm5R3cObrWBDYLrX9Jjrx8RIC22euE+95ILCNdnrt/3gJge10JvZTu58SgW1V3l5rcy1ZENhejbnP2vvVdwhstyWBMjufDoFtV9jazquXENh+Z2I22vdkCOyAO2kC36cmCIGdEM7rWm3TUyGwM5Z7bLp6CYEdsqctY+8eExDYKaWxtmwrjcCOqe2bbcOZPAjsoBkp8j9eQmAnfdJW+im1COyow21lX72EwM66mSz56iUEdlhj7kCpHy8hsOPmJcj8eAmBnbc16kt5D47ALnDGs0naYyOwG9ztkyvrlFoEdoVwXjdJHy8hsEts8sv5eAmB3aLYVyzlYRHYLW6kLJTwqAjsHo25mdbv2ILAbvJOyk2rHxKBXWVzzCmLHxGB3eVklNam44IQ2GUq08db+p4HAruNxe95ILD7LPdYuGMLArtQUZuDlj0WArvR9aTFVj0UAruSdafUIrBLzUi15pRaBHar5XEXrXgYBHatg20KLXgUBHavG+1nmn8QBHaxBgs+XkJgV5ueYva7lxDY3T6NMrk5HgK73MV4c18IgMBud7e3qS8EQGDXC+d1NPGeBwJHgGUm3vNA4EhwrPXnoocicEQoT3pT8EgEjgwNwzIbhA5E4EiR17lC5DAEjhg7YkoEjkLgyHEmeg3/IASOICKn1CJwJGnM6c/dsQWBI8sy7i61CBxhiqO/4K1H4AhzLWkRZzkCR5zqbpyXWggcgeYyPl5C4Ei0I+EcdSkCR6QvfdSXWggcmW6mEr9vGoEjFHXHFgSOWAuCVwmrEDhybYn+yngRAkewC/HG38yDwJGsKsPwlFoEjmihl3re1V+BwBHuo4QrWnfVn1w3/dV+bcZNWrJP/vcziUFgY0c9ex/8T7ObT76W7M/MX//5vu27t8wblRqb/UmjA8MZQWCCsnar7v230+kmN9XOi++y6kfXJTYW5T45yqYvPGVAYIra3l3CyokuP/w5v/Wk6y2XNawN9j1r41gUCEzzYo9aZeB336G2LWaO1nk9RYGJ1m9YbAYCE63wX70cePApcc3g/uXa68Lz401eb2wtBKaovHPv72b0Vy/d/6f4lHeZ/uKz8cRPKWyBwBRHkp/ZGT4TsyW2XimOMvw609pek+wYigaBaS7lxeUeShw4Y6/3kvHi0PCx8iciQmCq0GfPpET/i4e2ZcufJX/jKR0CM1we89eJtJWh7qvkjkKGwAyN7b44T1xaGydyHZsECMwwaSJ9bUmc2NXGVkNgurN+zmY806ZIG4QDgem6sLYurYuW+a3UZAhMVtyNt37dKDlz8CAwWQb3LciEa1Lm4EFgqm86cY9Y5oZ/hRGY6nX2b7Z1cTLmYEJgqniDU7NUPHtMwhxMCEx0KYN/zBoXfOiAwEQfvM0/5naK9XNwITDRsMPa9+16TOMOn4xJeBCYKKlW+z7NwF0vS5mFA4GJvDr3aQZ+ebuMUVgQmMincftBzy/jFmoFnr1U0jR0CExzt7367Tce675n1i+0Ai95R9pAVAhMU56ufvvMf69XlJFagddOkzYQFQLTVKaq3z64573/rNUKvFx0k3HrIDBNOEH99qz7gddrBZ7v/Am0CEzkU7951v0f0blagaeskzUOGQIT+dTP5rj1WPfCub/SCjzQ+YscEJio59fqtx+M+aVnm1bgAHdrYushMFGewHmwDXrvjtgEgYn2D+UfUzjc+jm4EJioMZp/zKurrZ+DC4GpBhxgH+LhnyNgOQSm2sXeTOfgIBlzMCEwVTi2inlE5l4pg/AgMNn7k3nrv+4oZw4eBCar91ay1g9x/sNgBYE51uVwVhd1lzUHCwIzpDXfC01HQ8Ade2YhMENZLH3DwuEfSRyEAYE5PulK/bqdlX2lDkKHwCyTX6CtKwrWyB2EDIF5ski/Kx31qGx06AwE5glljTS+zH+b94INo9AgMNfrnW8arJjVzmiFjRCYbWuM7lYON7qOccf2Kw8hMN/VHpk3tO4LL/S64g2s7yGwiM2eV1R/CodXxb2icw2TExBYSGhFYMD25q+2zk+Me0Xzr7ZTEFjUkZy23ecfqHj4h4bTa3O86audP8euBQQ24dzC51MDwcTEYDBpwJRCN720+gECP+IQ+BGHwI84BH7E/T90cic0LB3oRwAAAABJRU5ErkJggg==" alt="Pipeline output: PNG image file of graph" />
 <p class="caption">Pipeline output: PNG image file of graph</p>
 </div>
-<h2 id="searching-for-files-in-conduit">Searching for files in conduit</h2>
-<p>conduit allows the user to either specify the location of a resource file, or to provide a filename and file location(s) where the file should be found. Functions which have <code>ref</code> and <code>path</code> arguments provide the option to search for a resource.</p>
-<p>If the value of <code>ref</code> is an absolute resource address, e.g. a full file path, then no further searching will be done. Relative file paths can also be provided to <code>ref</code> arguments. <span class="ann">TODO: provide precise definition explaining to which location a relative ref is relative.</span></p>
-<p>If no resource can be sensibly found at <code>ref</code>, a search is started. Conduit will search by default in the directory for the module or pipeline which initiated the search, then R's current working directory. The default search paths can be amended or replaced by the <code>path</code> argument. Search paths are given as character strings, with each path divided by the '|' character. Values for <code>path</code> which end in '|' will be prepended to the default search paths, and those which beging with '|' will be appended.</p>
-<p>conduit will search in each search path provided until a matching file is located. The first match will be returned.</p>
-<p>The following example will attemp to load a module by searching for a file named in <code>ref</code> in the paths listed in <code>path</code>, and then the default search paths.</p>
-<pre class="sourceCode r"><code class="sourceCode r">mod1 &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="dt">name =</span> <span class="st">&quot;loader&quot;</span>, <span class="dt">ref =</span> <span class="st">&quot;arrangeLines.xml&quot;</span>,
-                   <span class="dt">path =</span> <span class="st">&quot;~/openapi|/media/ashley/floppyDisk|&quot;</span>)</code></pre>
-<h2 id="outputs-in-conduit">Outputs in <em>conduit</em></h2>
-<p>When a module's source code is executed in <em>conduit</em> by the <a href="#runmodule"><code>runModule()</code></a> function, the module's outputs are saved to disk in a directory with the same name as the module.</p>
-<p>Internal outputs are saved to disk by serializing objects in a file format relevant to the platform used. For example, imagine a module source script for the &quot;R&quot; platform creates an object, <code>finalData.df</code>. To mark this object as a module output the module must contain an internal output, named &quot;finalData.df&quot;. When the module's source script is executed <em>conduit</em> will produce a file named &quot;finalData.df.rds&quot; in the module's output directory; the file extension &quot;.rds&quot; is used for serializing R objects. Similarly, internal outputs from source scripts for the &quot;python&quot; platform will be serialized to a file with the file extension &quot;.pickle&quot;.</p>
-<p>External outputs should be easy to identify, as they will be explicitly named in the module's source script.</p>
-<h2 id="modules">modules</h2>
+<hr />
+<p>The remainder of this document goes into greater detail about how to create execute <em>openapi</em> <a href="#modules">modules</a> and <a href="#pipelines">pipelines</a> using <em>conduit</em>. Following these is a discussion on <a href="#searching-for-files-in-conduit">how to search for files in <em>conduit</em></a>, and about the <a href="#outputs-in-conduit">outputs produced by <em>conduit</em></a>. To finish there are two fully worked examples: how to create a pipeline containing modules with <a href="#example-creating-a-pipeline-from-r-scripts">R script files for sources</a>, and how to create a pipeline which uses both <a href="#example-combining-r-and-python-scripts">R scripts and python scripts</a>.</p>
+<h2 id="modules">Modules</h2>
 <p>This sections describes how to: load modules from XML files; create modules; execute module source scripts; save modules as module XML files.</p>
 <h3 id="loading-modules-from-xml">Loading modules from XML</h3>
 <h4 id="loadmodule"><code>loadModule()</code></h4>
@@ -160,7 +129,7 @@ simpleGraph &lt;-<span class="st"> </span>
 plotGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="dt">name =</span> <span class="st">&quot;plotGraph&quot;</span>,
                         <span class="dt">ref =</span> plotGraphXML)</code></pre>
 <h3 id="creating-modules">Creating modules</h3>
-<p>Modules can be created in conduit using the <code>module()</code> function and its associated helper functions. The resulting modules can be executed in conduit, or saved to disk as module XML files.</p>
+<p>Modules can be created in <em>conduit</em> using the <code>module()</code> function and its associated helper functions. The resulting modules can be executed in <em>conduit</em>, or saved to disk as module XML files.</p>
 <p>The following example shows how a module can be created.</p>
 <pre class="sourceCode r"><code class="sourceCode r">## create input, output, and source lists
 inputsList &lt;-<span class="st"> </span>
@@ -212,7 +181,7 @@ layoutGraph &lt;-<span class="st"> </span><span class="kw">module</span>(<span c
 inp2 &lt;-<span class="st"> </span><span class="kw">moduleInput</span>(<span class="dt">name =</span> <span class="st">&quot;boothLatLong&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;external&quot;</span>, 
                     <span class="dt">format =</span> <span class="st">&quot;CSV file&quot;</span>, <span class="dt">formatType =</span> <span class="st">&quot;text&quot;</span>)</code></pre>
 <h4 id="moduleoutput"><code>moduleOutput()</code></h4>
-<p>The <code>moduleOutput()</code> function is used to create the outputs for modules created in R with the <code>module()</code> function. Each &quot;internal&quot; output should correspond to an object of the same name in the module's source(s). &quot;external&quot; outputs are not produced by conduit, but are produced directly by the module source script(s). It is recommended that an &quot;external&quot; output have the same <code>name</code> and <code>ref</code>, though this is not compulsory. <code>moduleOutput()</code> requires the following arguments:</p>
+<p>The <code>moduleOutput()</code> function is used to create the outputs for modules created in R with the <code>module()</code> function. Each &quot;internal&quot; output should correspond to an object of the same name in the module's source(s). &quot;external&quot; outputs are not produced by <em>conduit</em>, but are produced directly by the module source script(s). It is recommended that an &quot;external&quot; output have the same <code>name</code> and <code>ref</code>, though this is not compulsory. <code>moduleOutput()</code> requires the following arguments:</p>
 <ul>
 <li><code>name</code>: output name (must be unique within a module)</li>
 <li><code>type</code>: &quot;internal&quot; or &quot;external&quot;
@@ -301,7 +270,7 @@ layoutGraph$name</code></pre>
 <pre><code>## [1] &quot;layoutGraph&quot;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">saveModule</span>(<span class="dt">module =</span> layoutGraph, <span class="dt">targetDirectory =</span> tempTarget)</code></pre>
 <pre><code>## [1] &quot;/tmp/RtmpqdixWi/layoutGraph.xml&quot;</code></pre>
-<h2 id="pipelines">pipelines</h2>
+<h2 id="pipelines">Pipelines</h2>
 <p>This sections describes how to: load pipelines from XML files; create pipelines ; execute pipeline components; save pipelines and their components as XML files.</p>
 <h3 id="loading-pipelines-from-xml">Loading pipelines from XML</h3>
 <h4 id="loadpipeline"><code>loadPipeline()</code></h4>
@@ -318,7 +287,7 @@ layoutGraph$name</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span><span class="kw">loadPipeline</span>(<span class="dt">name =</span> <span class="st">&quot;simpleGraph&quot;</span>,
                             <span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>))</code></pre>
 <h3 id="creating-pipelines">Creating pipelines</h3>
-<p>Pipelines can be created using the <code>pipeline()</code> function, and its associated helper functions. The resulting <code>pipeline</code> objects can be executed using conduit, or saved to disk as XML files.</p>
+<p>Pipelines can be created using the <code>pipeline()</code> function, and its associated helper functions. The resulting <code>pipeline</code> objects can be executed using <em>conduit</em>, or saved to disk as XML files.</p>
 <h4 id="pipeline"><code>pipeline()</code></h4>
 <p>The <code>pipeline</code> function requires a <code>name</code> argument. The following arguments can also be provided:</p>
 <ul>
@@ -462,8 +431,21 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 <li><a href="exportPipeline/graphExport/createGraph.xml">createGraph.xml</a></li>
 <li><a href="exportPipeline/graphExport/layoutGraph.xml">layoutGraph.xml</a></li>
 </ul>
+<h2 id="searching-for-files-in-conduit">Searching for files in <em>conduit</em></h2>
+<p><em>conduit</em> allows the user to either specify the location of a resource file, or to provide a filename and file location(s) where the file should be found. Functions which have <code>ref</code> and <code>path</code> arguments provide the option to search for a resource.</p>
+<p>If the value of <code>ref</code> is an absolute resource address, e.g. a full file path, then no further searching will be done. Relative file paths can also be provided to <code>ref</code> arguments. <span class="ann">TODO: provide precise definition explaining to which location a relative ref is relative.</span></p>
+<p>If no resource can be sensibly found at <code>ref</code>, a search is started. <em>Conduit</em> will search by default in the directory for the module or pipeline which initiated the search, then R's current working directory. The default search paths can be amended or replaced by the <code>path</code> argument. Search paths are given as character strings, with each path divided by the '|' character. Values for <code>path</code> which end in '|' will be prepended to the default search paths, and those which beging with '|' will be appended.</p>
+<p><em>conduit</em> will search in each search path provided until a matching file is located. The first match will be returned.</p>
+<p>The following example will attemp to load a module by searching for a file named in <code>ref</code> in the paths listed in <code>path</code>, and then the default search paths.</p>
+<pre class="sourceCode r"><code class="sourceCode r">mod1 &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="dt">name =</span> <span class="st">&quot;loader&quot;</span>, <span class="dt">ref =</span> <span class="st">&quot;arrangeLines.xml&quot;</span>,
+                   <span class="dt">path =</span> <span class="st">&quot;~/openapi|/media/ashley/floppyDisk|&quot;</span>)</code></pre>
+<h2 id="outputs-in-conduit">Outputs in <em>conduit</em></h2>
+<p>When a module's source code is executed in <em>conduit</em> by the <a href="#runmodule"><code>runModule()</code></a> function, the module's outputs are saved to disk in a directory with the same name as the module.</p>
+<p>Internal outputs are saved to disk by serializing objects in a file format relevant to the platform used. For example, imagine a module source script for the &quot;R&quot; platform creates an object, <code>finalData.df</code>. To mark this object as a module output the module must contain an internal output, named &quot;finalData.df&quot;. When the module's source script is executed <em>conduit</em> will produce a file named &quot;finalData.df.rds&quot; in the module's output directory; the file extension &quot;.rds&quot; is used for serializing R objects. Similarly, internal outputs from source scripts for the &quot;python&quot; platform will be serialized to a file with the file extension &quot;.pickle&quot;.</p>
+<p>External outputs should be easy to identify, as they will be explicitly named in the module's source script.</p>
 <h2 id="example-creating-a-pipeline-from-r-scripts">Example: creating a pipeline from R scripts</h2>
 <p>In this example I will demonstrate how a pipeline can be created using R scripts for the modules' source scripts. We will create the &quot;simpleGraph&quot; module seen throughout this document. All this pipeline's modules will be executed on the &quot;R&quot; platform. The first module creates a graphNEL object; the second module will use this &quot;graphNEL&quot; object to create an &quot;Ragraph&quot; object; the last module will produce a PNG image of the &quot;Ragraph&quot; object.</p>
+<p><span class="ann">TODO: make mention of packages used</spa></p>
 <h3 id="r-scripts">R scripts</h3>
 <p>The R scripts for our example are as follows:</p>
 <ul>
@@ -584,10 +566,23 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 <li><a href="example1/simpleGraph/layoutGraph.xml" class="uri">example1/simpleGraph/layoutGraph.xml</a></li>
 <li><a href="example1/simpleGraph/plotGraph.xml" class="uri">example1/simpleGraph/plotGraph.xml</a></li>
 </ul>
+<h2 id="example-combining-r-and-python-scripts">Example: combining R and python scripts</h2>
+<p><span class="ann">TODO: write an example combining R and python scripts</span></p>
 <hr />
-<p><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFgAAAAfCAYAAABjyArgAAAFOklEQVRo3u1aTU8bRxj2OVIs7lw4hhttlR5TpPQHkB+QiH9Q1FskqqCIVIpUCVmuoubQUKm3JrDG5sNfeA1rY3vX9noh5MpP4Ce81fOu32V2WfAHzhoTRhqx3pmdHZ595nk/ZmJEFI/FYnRfR1+J8Kf7Yye/TXvFXcqVslQ8KFDJKNFBtUxG3aAjs0r1Zo0arQZZbZOatkXNTtOttkWWbZLZanAf9K3UDX5WN0o8Vq6U47Hxjkw2TVt7KUrtaLS5vUEbmU9cP6U/0set/+5MVYC+ADev52j/sEjlik5G7ZDBarTqDGDbaVHnxCbnc4eOT4/p5Itbce18drgNfSzb4mfwLMYoV3UeE2MHQdZ2Nj2QAfAdBTnmB7daZgbWrBqzFaAB1NU3q/T056f0MP7w0lLAPbSt/r7KfdvHbf4oYHSlUWE27x/u+0BOZ7cotau5IGc2Rsbil8svaXZ29tIccQ9tYwEYsqCCC2CaHYtZmUgmaHp6um/dQd/Enwl+FhICNlc9kIueXGznMpTec0EeBYuTfyXp0ewjbx7z8/O0tLTEFddyH33QN1KAoZOQhQtwm8zEhWcLPvCmpqZocXGRVlZWSNd1rrjGPbSpffFspWZQy3FBBpMhF64mZ2m3sOOXihuweP3fDxSPx933LizQ2dkZBQvuoQ190DcKkD2AYdCgl5AFMDcILsADkOfn53RdWV9f9wENtgBkfDB8OLwDhq9QzlN2f8+VihAWD/qPCHPxodWiWHPfHGVukQGM5QujBM3F0lbBnZubC2XEVQUfAc+oTMaY0GS840IqFBbvpkjb3hxKJqCrwtwvp6c9AUYRJn9tTfYANlga6mzQoLkquL1Y2w/I0GQYPpaKukF6xWUxa3He1WKRiUEBFoM2CAnQVwxfJAAze22TpUEMGpa6bds0bAHIIhcYE2PDhRMWFw9cFqsexTAyIQYtWCAX8oGD0oEihi8SgKGPLafFrphMCpp70yJ6hwoXDitEtLjUddtUmRgWYHgKwRISVfkKnokMYERo9onNvqywV5UGeAvQLXx1VBX8YNva2prvHxEWY2xoMSK+SzKRy7jehKLDdwpgGDcsYQki1CUFAMP8XYCpaVpom/q8LFWMjYgPUlTtumyFcoG9CeiwuGt3UiKQTzg+dbwJqSwUYzUzM8PGAYDjGstf2sTTAODSFiYTCKubPh0u+Ny1YQC+zshdxd7IjRx8X+QVZEIAMTjJME3uR6/VFYB3wCc+Mo9GBrDqpvULcORu2iQDPGigIdobaaDRr0TA8MF1wzVAVSUi2BaVRExEqHydkbvOkPVj5IQxrpHr8LtGaeRUkNVkDz465oH3q0HPWJI94qZJiAzXKrjMr3LTALLcD7ahgNGqm9ZQ3LS8fnM3bSLSlRJoqGFy0J8dZaBx2A00kLqUQOOmCZ9bnXCvNsJD5UHi+3GFyhMBsJrs+fDP36NP9iQTPDaSPXiXpCzVxPuwyZ6JABh1+dWyl658/uK5D+RBkj5gfWi6sm3S6zevv8Xd5YsfS7/+wm5UZ4iEO9rQR024P/7xMUsD/Gx8wG90+95/47dXyxwMAGSVycNsGQHcVqdJ796/i+ocQmiQEewzVoA9kG130xOaPPCmZ1I2Pa3IwA2CF3Y9BnDDARa5ULftAVqvbXvsXPC2Pc5HtM3IZaFXuvJWSIRav//hO9LSGrtw8JNt7+CJoxw8cfieevAkldHoyU9PxnFU6TZJQ2+ApQKst3+8pWK5qByd6lYcnWqb3IY+4wB2Yhl8X0dQiejBPRBf73Tl/8YjNDN/aKmsAAAAAElFTkSuQmCC" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Guide to using conduit</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://canadia.co.nz/" property="cc:attributionName" rel="cc:attributionURL">Ashley Noel Hinton</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.</p>
+<p><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFgAAAAfCAYAAABjyArgAAAFOklEQVRo3u1aTU8bRxj2OVIs7lw4hhttlR5TpPQHkB+QiH9Q1FskqqCIVIpUCVmuoubQUKm3JrDG5sNfeA1rY3vX9noh5MpP4Ce81fOu32V2WfAHzhoTRhqx3pmdHZ595nk/ZmJEFI/FYnRfR1+J8Kf7Yye/TXvFXcqVslQ8KFDJKNFBtUxG3aAjs0r1Zo0arQZZbZOatkXNTtOttkWWbZLZanAf9K3UDX5WN0o8Vq6U47Hxjkw2TVt7KUrtaLS5vUEbmU9cP6U/0set/+5MVYC+ADev52j/sEjlik5G7ZDBarTqDGDbaVHnxCbnc4eOT4/p5Itbce18drgNfSzb4mfwLMYoV3UeE2MHQdZ2Nj2QAfAdBTnmB7daZgbWrBqzFaAB1NU3q/T056f0MP7w0lLAPbSt/r7KfdvHbf4oYHSlUWE27x/u+0BOZ7cotau5IGc2Rsbil8svaXZ29tIccQ9tYwEYsqCCC2CaHYtZmUgmaHp6um/dQd/Enwl+FhICNlc9kIueXGznMpTec0EeBYuTfyXp0ewjbx7z8/O0tLTEFddyH33QN1KAoZOQhQtwm8zEhWcLPvCmpqZocXGRVlZWSNd1rrjGPbSpffFspWZQy3FBBpMhF64mZ2m3sOOXihuweP3fDxSPx933LizQ2dkZBQvuoQ190DcKkD2AYdCgl5AFMDcILsADkOfn53RdWV9f9wENtgBkfDB8OLwDhq9QzlN2f8+VihAWD/qPCHPxodWiWHPfHGVukQGM5QujBM3F0lbBnZubC2XEVQUfAc+oTMaY0GS840IqFBbvpkjb3hxKJqCrwtwvp6c9AUYRJn9tTfYANlga6mzQoLkquL1Y2w/I0GQYPpaKukF6xWUxa3He1WKRiUEBFoM2CAnQVwxfJAAze22TpUEMGpa6bds0bAHIIhcYE2PDhRMWFw9cFqsexTAyIQYtWCAX8oGD0oEihi8SgKGPLafFrphMCpp70yJ6hwoXDitEtLjUddtUmRgWYHgKwRISVfkKnokMYERo9onNvqywV5UGeAvQLXx1VBX8YNva2prvHxEWY2xoMSK+SzKRy7jehKLDdwpgGDcsYQki1CUFAMP8XYCpaVpom/q8LFWMjYgPUlTtumyFcoG9CeiwuGt3UiKQTzg+dbwJqSwUYzUzM8PGAYDjGstf2sTTAODSFiYTCKubPh0u+Ny1YQC+zshdxd7IjRx8X+QVZEIAMTjJME3uR6/VFYB3wCc+Mo9GBrDqpvULcORu2iQDPGigIdobaaDRr0TA8MF1wzVAVSUi2BaVRExEqHydkbvOkPVj5IQxrpHr8LtGaeRUkNVkDz465oH3q0HPWJI94qZJiAzXKrjMr3LTALLcD7ahgNGqm9ZQ3LS8fnM3bSLSlRJoqGFy0J8dZaBx2A00kLqUQOOmCZ9bnXCvNsJD5UHi+3GFyhMBsJrs+fDP36NP9iQTPDaSPXiXpCzVxPuwyZ6JABh1+dWyl658/uK5D+RBkj5gfWi6sm3S6zevv8Xd5YsfS7/+wm5UZ4iEO9rQR024P/7xMUsD/Gx8wG90+95/47dXyxwMAGSVycNsGQHcVqdJ796/i+ocQmiQEewzVoA9kG130xOaPPCmZ1I2Pa3IwA2CF3Y9BnDDARa5ULftAVqvbXvsXPC2Pc5HtM3IZaFXuvJWSIRav//hO9LSGrtw8JNt7+CJoxw8cfieevAkldHoyU9PxnFU6TZJQ2+ApQKst3+8pWK5qByd6lYcnWqb3IY+4wB2Yhl8X0dQiejBPRBf73Tl/8YjNDN/aKmsAAAAAElFTkSuQmCC" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Guide to using <em>conduit</em></span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://canadia.co.nz/" property="cc:attributionName" rel="cc:attributionURL">Ashley Noel Hinton</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.</p>
+<hr />
 <div class="references">
-
+<h2 id="references" class="unnumbered">References</h2>
+<p>Carey, Vince, Li Long, and R. Gentleman. <em>RBGL: An Interface to the BOOST Graph Library</em>. <a href="http://www.bioconductor.org" class="uri">http://www.bioconductor.org</a>.</p>
+<p>Gentleman, R., Elizabeth Whalen, W. Huber, and S. Falcon. <em>Graph: Graph: A Package to Handle Graph Data Structures</em>.</p>
+<p>Hansen, Kasper Daniel, Jeff Gentry, Li Long, Robert Gentleman, Seth Falcon, Florian Hahne, and Deepayan Sarkar. <em>Rgraphviz: Provides Plotting Capabilities for R Graph Objects</em>.</p>
+<p>Hinton, Ashley Noel, and Paul Murrell. 2014. <em>Conduit: Prototype Glue System for Openapi</em>.</p>
+<p>———. 2015. “Introducing Openapi.” Auckland, New Zealand: Department of Statistics, University of Auckland. <a href="https://www.stat.auckland.ac.nz/~paul/Reports/introducingOpenapi/introducingOpenapi.html" class="uri">https://www.stat.auckland.ac.nz/~paul/Reports/introducingOpenapi/introducingOpenapi.html</a>.</p>
+<p>Lang, Duncan Temple. 2013. <em>XML: Tools for Parsing and Generating XML Within R and S-Plus.</em> <a href="http://CRAN.R-project.org/package=XML" class="uri">http://CRAN.R-project.org/package=XML</a>.</p>
+<p>———. 2014. <em>RCurl: General Network (HTTP/FTP/.) Client Interface for R</em>. <a href="http://CRAN.R-project.org/package=RCurl" class="uri">http://CRAN.R-project.org/package=RCurl</a>.</p>
+<p>Murrell, Paul, and Ashley Noel Hinton. 2014. <em>GridGraphviz: Drawing Graphs with Grid</em>. <a href="http://R-Forge.R-project.org/projects/gridgraph/" class="uri">http://R-Forge.R-project.org/projects/gridgraph/</a>.</p>
+<p>R Core Team. 2014. <em>R: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="http://www.R-project.org/" class="uri">http://www.R-project.org/</a>.</p>
+<p>Wickham, Hadley, and Winston Chang. 2014. <em>Devtools: Tools to Make Developing R Code Easier</em>. <a href="http://CRAN.R-project.org/package=devtools" class="uri">http://CRAN.R-project.org/package=devtools</a>.</p>
 </div>
 </div>
 </body>
