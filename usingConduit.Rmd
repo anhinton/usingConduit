@@ -19,7 +19,7 @@ the user's requirements. Modules and pipelines are exected in an
 been written as a package for the R programming environment. More
 information on the *openapi* project can be found in the University of
 Auckland Department of Statistics technical report, [Introducing
-*openapi*][introducingOpenapi].
+OpenAPI][introducingOpenapi].
 
 
 Quick start: running a pipeline
@@ -928,7 +928,7 @@ Example: combining R and python scripts
 References
 ----------
 
-[introducingOpenapi]: https://www.stat.auckland.ac.nz/~paul/Reports/introducingOpenapi/introducingOpenapi.html
+[introducingOpenapi]: https://www.stat.auckland.ac.nz/~paul/Reports/openapi/introducingOpenapi/introducingOpenapi.html
 [xml-package]: http://www.omegahat.org/RSXML "XML: Tools for parsing and
 	       generating XML within R and S-Plus"
 [graph-package]: http://bioconductor.org/packages/release/bioc/html/graph.html
