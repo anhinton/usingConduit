@@ -702,12 +702,19 @@ Example: creating a pipeline from R scripts
 -------
 
 In this example I will demonstrate how a pipeline can be created using
-R scripts for the modules' source scripts. We will create the
-"simpleGraph" module seen throughout this document. All this
-pipeline's modules will be executed on the "R" platform. The first
-module creates a graphNEL object; the second module will use this
-"graphNEL" object to create an "Ragraph" object; the last module will
-produce a PNG image of the "Ragraph" object.
+R scripts for the modules' source scripts. We will create a pipeline
+called "aucklandRents" which reads in prices of flat listings from
+various Auckland suburbs and creates a boxplot comparison of three of
+those suburbs. Our first two modules will be 'dummy' modules, which
+load CSV files into `conduit`; one CSV file contains rental prices
+indexed by suburb, and the other contains a key for the suburb
+indices.  The next module uses the suburb key to name the suburbs in
+the price listings, and produces an R data frame of this. This R data
+frame is cropped to the suburbs of interest in the next module, then
+the final module produces a boxplot of the rental prices for each
+suburb remaining.
+
+<span class="ann">TODO: I am up to here</span>
 
 <span class="ann">TODO: make mention of packages used</span>
 
