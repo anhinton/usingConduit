@@ -9,8 +9,6 @@
   <style type="text/css">
     div.main { margin: auto; max-width: 800px; }
     code{ white-space: pre-wrap; }
-    .ann {color: green; font-style: italic; background-color: silver; border: solid thin}
-    .mod {color: red; font-style: italic; background-color: silver; border: solid thin}
   </style>
   <style type="text/css">
 table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
@@ -450,7 +448,7 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 <p>External outputs should be easy to identify, as they will be explicitly named in the module's source script.</p>
 <h2 id="example-creating-a-pipeline-from-r-scripts">Example: creating a pipeline from R scripts</h2>
 <p>In this example I will demonstrate how a pipeline can be created using R scripts for the modules' source scripts. We will create the &quot;simpleGraph&quot; module seen throughout this document. All this pipeline's modules will be executed on the &quot;R&quot; platform. The first module creates a graphNEL object; the second module will use this &quot;graphNEL&quot; object to create an &quot;Ragraph&quot; object; the last module will produce a PNG image of the &quot;Ragraph&quot; object.</p>
-<p><span class="ann">TODO: make mention of packages used</spa></p>
+<p><span class="ann">TODO: make mention of packages used</span></p>
 <h3 id="r-scripts">R scripts</h3>
 <p>The R scripts for our example are as follows:</p>
 <ul>

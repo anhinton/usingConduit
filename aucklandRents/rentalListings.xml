@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<module xmlns="http://www.openapi.org/2014/">
+  <description>load rentalListings.csv into session</description>
+  <platform name="R"/>
+  <output name="rentalListings.csv" type="external" ref="~/files.fos/openapi/scripts/aucklandRents/data/rentalListings.csv">
+    <format formatType="text">CSV file</format>
+  </output>
+</module>

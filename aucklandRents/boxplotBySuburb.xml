@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<module xmlns="http://www.openapi.org/2014/">
+  <description></description>
+  <platform name="R"/>
+  <input name="rentalListings" type="internal">
+    <format formatType="text">R data frame</format>
+  </input>
+  <source ref="~/files.fos/openapi/scripts/aucklandRents/src/boxplotBySuburb.R"/>
+  <output name="boxplot-rentBySuburb.png" type="external" ref="boxplot-rentBySuburb.png">
+    <format formatType="text"></format>
+  </output>
+</module>

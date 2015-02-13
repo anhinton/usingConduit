@@ -709,7 +709,7 @@ module creates a graphNEL object; the second module will use this
 "graphNEL" object to create an "Ragraph" object; the last module will
 produce a PNG image of the "Ragraph" object.
 
-<span class="ann">TODO: make mention of packages used</spa>
+<span class="ann">TODO: make mention of packages used</span>
 
 ### R scripts
 
