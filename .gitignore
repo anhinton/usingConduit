@@ -1,7 +1,0 @@
-# files I might produce that are not for the website
-*.pdf
-
-# knitr and rmarkdown cache directories
-cache/
-*_cache/
-*_files/

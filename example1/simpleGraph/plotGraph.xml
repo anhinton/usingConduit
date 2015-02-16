@@ -5,7 +5,7 @@
   <input name="Ragraph" type="internal">
     <format formatType="text">R "Ragraph" object</format>
   </input>
-  <source ref="example1/scripts/plotGraph.R" path=".//|${ROOT}"/>
+  <source ref="example1/scripts/plotGraph.R"/>
   <output name="example.png" type="external" ref="example.png">
     <format formatType="text">PNG image file</format>
   </output>

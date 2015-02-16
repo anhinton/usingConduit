@@ -5,10 +5,7 @@
   <input name="Ragraph" type="internal">
     <format formatType="text">R "Ragraph" object</format>
   </input>
-  <source><![CDATA[library(gridGraphviz)
-png("example.png")
-grid.graph(Ragraph, newpage=TRUE)
-dev.off()]]></source>
+  <source ref="example1/scripts/plotGraph.R" path=".//|${ROOT}"/>
   <output name="example.png" type="external" ref="example.png">
     <format formatType="text">PNG image file</format>
   </output>
