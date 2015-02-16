@@ -64,6 +64,7 @@ Department of Statistics, The University of Auckland
 <li><a href="#outputs-in-conduit">Outputs in <em>conduit</em></a></li>
 <li><a href="#example-creating-a-pipeline-from-r-scripts">Example: creating a pipeline from R scripts</a><ul>
 <li><a href="#r-scripts">R scripts</a></li>
+<li><a href="#getting-data-into-conduit">Getting data into conduit</a></li>
 <li><a href="#creating-the-first-module-creategraph">Creating the first module: <code>createGraph</code></a></li>
 <li><a href="#the-second-module-layoutgraph">The second module: <code>layoutGraph</code></a></li>
 <li><a href="#the-last-module-plotgraph">The last module: <code>plotGraph</code></a></li>
@@ -462,7 +463,7 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 <h3 id="r-scripts">R scripts</h3>
 <p>The R scripts for our example are as follows:</p>
 <ul>
-<li><a href="aucklandRents/scripts/nameSuburbs.R">nameSuburbs.R</a>:</li>
+<li><a href="aucklandRents/src/nameSuburbs.R">nameSuburbs.R</a>:</li>
 </ul>
 <pre><code>## rentalListings &lt;- read.csv(rentalListings.csv, header = TRUE)
 ## suburbIDs &lt;- read.csv(suburbIDs.csv, header = TRUE, stringsAsFactors = FALSE)
@@ -472,7 +473,7 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 ## subNames &lt;- sapply(subIDs, function(subID) suburbIDs[subID == suburbIDs[,1],2])
 ## levels(rentalListings$suburb) &lt;- subNames</code></pre>
 <ul>
-<li><a href="aucklandRents/scripts/chooseSuburbs.R">chooseSuburbs.R</a>:</li>
+<li><a href="aucklandRents/src/chooseSuburbs.R">chooseSuburbs.R</a>:</li>
 </ul>
 <pre><code>## inKingsland &lt;- rentalListings$suburb == &quot;Kingsland&quot;
 ## inGreyLynn &lt;- rentalListings$suburb == &quot;Grey Lynn&quot;
@@ -483,13 +484,15 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 ## rentalListings &lt;- rentalListings[ofInterest,]
 ## rentalListings$suburb &lt;- factor(rentalListings$suburb)</code></pre>
 <ul>
-<li><a href="aucklandRents/scripts/boxplotBySuburb.R">boxplotBySuburb.R</a>:</li>
+<li><a href="aucklandRents/src/boxplotBySuburb.R">boxplotBySuburb.R</a>:</li>
 </ul>
 <pre><code>## svg(&quot;boxplot-rentBySuburb.svg&quot;)
 ## boxplot(rentalListings$rent ~ rentalListings$suburb, xlab = &quot;Suburb&quot;,
 ##         ylab = &quot;Rent per week ($)&quot;, main=&quot;Rental prices in Auckland&quot;)
 ## dev.off()</code></pre>
 <p>R users will notice that the first script calls for files <code>rentalListings.csv</code> and <code>suburbIDs.csv</code> but that no such objects have been created. These object will be named as an inputs for this module, and will be made available to the module's R script by the glue system. Similarly the data frame <code>rentalListings</code> will be named as an input for the second module.</p>
+<h3 id="getting-data-into-conduit">Getting data into conduit</h3>
+<p>This module needs to read data from two CSV files, <a href="aucklandRents/data/rentalListings.csv">rentalListings.csv</a> and <a href="suburbIDs.csv" class="uri">suburbIDs.csv</a>.</p>
 <h3 id="creating-the-first-module-creategraph">Creating the first module: <code>createGraph</code></h3>
 <p>The first module has one source script, from the file <a href="example1/scripts/createGraph.R">createGraph.R</a>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">createGraphSource &lt;-<span class="st"> </span><span class="kw">moduleSource</span>(<span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;example1&quot;</span>, <span class="st">&quot;scripts&quot;</span>,

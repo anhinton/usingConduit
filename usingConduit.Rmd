@@ -749,7 +749,11 @@ input for the second module.
 
 ### Getting data into conduit
 
-This module needs to read data from two CSV files, [rentalListings.csv](aucklandRents/data/
+This module needs to read data from two CSV files,
+[rentalListings.csv](https://gist.github.com/anhinton/d174df68c7a050201841/raw/6370e0e970f4d59fe788ec12748f6232b278f85c/rentalListings.csv)
+and
+[suburbIDs.csv](https://gist.github.com/anhinton/d174df68c7a050201841/raw/11b510fca1c27cc965fb9c68bc391ae04d868a6e/suburbIDs.csv). For
+each
 
 ### Creating the first module: `createGraph`
 
