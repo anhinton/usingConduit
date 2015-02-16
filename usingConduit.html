@@ -456,35 +456,40 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 <p>Internal outputs are saved to disk by serializing objects in a file format relevant to the platform used. For example, imagine a module source script for the &quot;R&quot; platform creates an object, <code>finalData.df</code>. To mark this object as a module output the module must contain an internal output, named &quot;finalData.df&quot;. When the module's source script is executed <em>conduit</em> will produce a file named &quot;finalData.df.rds&quot; in the module's output directory; the file extension &quot;.rds&quot; is used for serializing R objects. Similarly, internal outputs from source scripts for the &quot;python&quot; platform will be serialized to a file with the file extension &quot;.pickle&quot;.</p>
 <p>External outputs should be easy to identify, as they will be explicitly named in the module's source script.</p>
 <h2 id="example-creating-a-pipeline-from-r-scripts">Example: creating a pipeline from R scripts</h2>
-<p>In this example I will demonstrate how a pipeline can be created using R scripts for the modules' source scripts. We will create a pipeline called &quot;aucklandRents&quot; which reads in prices of flat listings from various Auckland suburbs and creates a boxplot comparison of three of those suburbs. Our first two modules will be 'dummy' modules, which load CSV files into <code>conduit</code>; one CSV file contains rental prices indexed by suburb, and the other contains a key for the suburb indices. The next module uses the suburb key to name the suburbs in the price listings, and produces an R data frame of this. This R data frame is cropped to the suburbs of interest in the next module, then the final module produces a boxplot of the rental prices for each suburb remaining.</p>
+<p>In this example I will demonstrate how a pipeline can be created using R scripts for the modules' source scripts. We will create a pipeline called &quot;aucklandRents&quot; which reads in prices of flat listings for various Auckland suburbs and creates a boxplot comparison of three of those suburbs. Our first two modules will be 'dummy' modules, which load CSV files into <code>conduit</code>; one CSV file contains rental prices indexed by suburb, and the other contains a key for the suburb indices. The next module uses the suburb key to name the suburbs in the price listings, and produces an R data frame of this. This R data frame is cropped to the suburbs of interest in the next module, then the final module produces a boxplot of the rental prices for each suburb remaining.</p>
 <p><span class="ann">TODO: I am up to here</span></p>
 <p><span class="ann">TODO: make mention of packages used</span></p>
 <h3 id="r-scripts">R scripts</h3>
 <p>The R scripts for our example are as follows:</p>
 <ul>
-<li><a href="example1/scripts/createGraph.R">createGraph.R</a>:</li>
+<li><a href="aucklandRents/scripts/nameSuburbs.R">nameSuburbs.R</a>:</li>
 </ul>
-<pre><code>## library(graph)
-## nodes &lt;- c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;)
-## edgeList &lt;- list(a=list(edges=c(&quot;b&quot;)),
-##                  b=list(edges=c(&quot;c&quot;)),
-##                  c=list(edges=c(&quot;d&quot;)),
-##                  d=list(edges=c(&quot;a&quot;)))
-## directedGraph &lt;- new(&quot;graphNEL&quot;, nodes=nodes, edgeL=edgeList, 
-##                      edgemode=&quot;directed&quot;)</code></pre>
+<pre><code>## rentalListings &lt;- read.csv(rentalListings.csv, header = TRUE)
+## suburbIDs &lt;- read.csv(suburbIDs.csv, header = TRUE, stringsAsFactors = FALSE)
+##  
+## rentalListings$suburb &lt;- as.factor(rentalListings$suburb)
+## subIDs &lt;- levels(rentalListings$suburb)
+## subNames &lt;- sapply(subIDs, function(subID) suburbIDs[subID == suburbIDs[,1],2])
+## levels(rentalListings$suburb) &lt;- subNames</code></pre>
 <ul>
-<li><a href="example1/scripts/layoutGraph.R">layoutGraph.R</a>:</li>
+<li><a href="aucklandRents/scripts/chooseSuburbs.R">chooseSuburbs.R</a>:</li>
 </ul>
-<pre><code>## library(Rgraphviz)
-## Ragraph &lt;- agopen(myGraph, &quot;myGraph&quot;)</code></pre>
+<pre><code>## inKingsland &lt;- rentalListings$suburb == &quot;Kingsland&quot;
+## inGreyLynn &lt;- rentalListings$suburb == &quot;Grey Lynn&quot;
+## inPonsonby &lt;- rentalListings$suburb == &quot;Ponsonby&quot;
+## 
+## ofInterest &lt;- inKingsland | inGreyLynn | inPonsonby
+## 
+## rentalListings &lt;- rentalListings[ofInterest,]
+## rentalListings$suburb &lt;- factor(rentalListings$suburb)</code></pre>
 <ul>
-<li><a href="example1/scripts/plotGraph.R">plotGraph.R</a>:</li>
+<li><a href="aucklandRents/scripts/boxplotBySuburb.R">boxplotBySuburb.R</a>:</li>
 </ul>
-<pre><code>## library(gridGraphviz)
-## png(&quot;example.png&quot;)
-## grid.graph(Ragraph, newpage=TRUE)
+<pre><code>## svg(&quot;boxplot-rentBySuburb.svg&quot;)
+## boxplot(rentalListings$rent ~ rentalListings$suburb, xlab = &quot;Suburb&quot;,
+##         ylab = &quot;Rent per week ($)&quot;, main=&quot;Rental prices in Auckland&quot;)
 ## dev.off()</code></pre>
-<p>R users will notice that the second script calls for a &quot;graphNEL&quot; object <code>myGraph</code>, but that no such object has been created in the preceding scripts. This object will be named as an input of the second module, and will be made available to the module's R script by the glue system. The object <code>Ragraph</code> in the third script will also be named as an nput for the third module.</p>
+<p>R users will notice that the first script calls for files <code>rentalListings.csv</code> and <code>suburbIDs.csv</code> but that no such objects have been created. These object will be named as an inputs for this module, and will be made available to the module's R script by the glue system. Similarly the data frame <code>rentalListings</code> will be named as an input for the second module.</p>
 <h3 id="creating-the-first-module-creategraph">Creating the first module: <code>createGraph</code></h3>
 <p>The first module has one source script, from the file <a href="example1/scripts/createGraph.R">createGraph.R</a>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">createGraphSource &lt;-<span class="st"> </span><span class="kw">moduleSource</span>(<span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;example1&quot;</span>, <span class="st">&quot;scripts&quot;</span>,

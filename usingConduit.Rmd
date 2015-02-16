@@ -703,7 +703,7 @@ Example: creating a pipeline from R scripts
 
 In this example I will demonstrate how a pipeline can be created using
 R scripts for the modules' source scripts. We will create a pipeline
-called "aucklandRents" which reads in prices of flat listings from
+called "aucklandRents" which reads in prices of flat listings for
 various Auckland suburbs and creates a boxplot comparison of three of
 those suburbs. Our first two modules will be 'dummy' modules, which
 load CSV files into `conduit`; one CSV file contains rental prices
@@ -722,30 +722,30 @@ suburb remaining.
 
 The R scripts for our example are as follows: 
 
-  + [createGraph.R](example1/scripts/createGraph.R):
+  + [nameSuburbs.R](aucklandRents/scripts/nameSuburbs.R):
 
-```{r createGraphScript, echo=FALSE}
-cat(readLines("example1/scripts/createGraph.R"), sep="\n")
+```{r nameSuburbsScript, echo=FALSE}
+cat(readLines("aucklandRents/scripts/nameSuburbs.R"), sep="\n")
 ```
     
-  + [layoutGraph.R](example1/scripts/layoutGraph.R):
+  + [chooseSuburbs.R](aucklandRents/scripts/chooseSuburbs.R):
 
-```{r layoutGraphScript, echo=FALSE}
-cat(readLines("example1/scripts/layoutGraph.R"), sep="\n")
+```{r chooseSuburbsScript, echo=FALSE}
+cat(readLines("aucklandRents/scripts/chooseSuburbs.R"), sep="\n")
 ```
     
-  + [plotGraph.R](example1/scripts/plotGraph.R):
+  + [boxplotBySuburb.R](aucklandRents/scripts/boxplotBySuburb.R):
 
-```{r plotGraphScript, echo=FALSE}
-cat(readLines("example1/scripts/plotGraph.R"), sep="\n")
+```{r boxplotBySuburbScript, echo=FALSE}
+cat(readLines("aucklandRents/scripts/boxplotBySuburb.R"), sep="\n")
 ```
 
-R users will notice that the second script calls for a "graphNEL"
-object `myGraph`, but that no such object has been created in the
-preceding scripts. This object will be named as an input of the second
-module, and will be made available to the module's R script by the
-glue system. The object `Ragraph` in the third script will also be
-named as an nput for the third module.
+R users will notice that the first script calls for files
+`rentalListings.csv` and `suburbIDs.csv` but that no such objects have
+been created. These object will be named as an inputs for this module,
+and will be made available to the module's R script by the glue
+system. Similarly the data frame `rentalListings` will be named as an
+input for the second module.
 
 ### Creating the first module: `createGraph`
 
