@@ -714,8 +714,6 @@ frame is cropped to the suburbs of interest in the next module, then
 the final module produces a boxplot of the rental prices for each
 suburb remaining.
 
-<span class="ann">TODO: I am up to here</span>
-
 <span class="ann">TODO: make mention of packages used</span>
 
 ### R scripts
@@ -747,22 +745,78 @@ and will be made available to the module's R script by the glue
 system. Similarly the data frame `rentalListings` will be named as an
 input for the second module.
 
-### Getting data into conduit
+### Getting data into conduit: `rentalListings` and `suburbIDs`
 
 This module needs to read data from two CSV files,
 [rentalListings.csv](https://gist.github.com/anhinton/d174df68c7a050201841/raw/6370e0e970f4d59fe788ec12748f6232b278f85c/rentalListings.csv)
 and
 [suburbIDs.csv](https://gist.github.com/anhinton/d174df68c7a050201841/raw/11b510fca1c27cc965fb9c68bc391ae04d868a6e/suburbIDs.csv). For
-each
+each CSV file we will create a dummy module which provides the file as
+an external output.
 
-### Creating the first module: `createGraph`
+The `rentalListings` module will have one output, our pre-existing CSV:
 
-The first module has one source script, from the file
-[createGraph.R](example1/scripts/createGraph.R):
+``` {r rentalListingsOutput}
+rentalListingsOutput <- 
+    moduleOutput(name = "rentalListings.csv", type = "external",
+                 format = "CSV file",
+                 ref = "https://gist.github.com/anhinton/d174df68c7a050201841/raw/6370e0e970f4d59fe788ec12748f6232b278f85c/rentalListings.csv")
+```
 
-```{r createGraphSource}
-createGraphSource <- moduleSource(ref = file.path("example1", "scripts",
-                                                  "createGraph.R"))
+We will create the `rentalListings` module as follows:
+
+```{r rentalListingsModule}
+rentalListings <-
+    module(name = "rentalListings", platform = "R",
+           description = "load rentalListings.csv into session",
+           outputs = list(rentalListingsOutput))
+```
+
+The `suburbIDs module is created similarly:
+
+```{r suburbIDsModule}
+suburbIDs <-
+    module("suburbIDs", "R", "load suburbIDs.csv into session",
+           outputs = list(
+               moduleOutput("suburbIDs.csv", "external", "CSV file",
+                            ref = "https://gist.github.com/anhinton/d174df68c7a050201841/raw/11b510fca1c27cc965fb9c68bc391ae04d868a6e/suburbIDs.csv")))
+```
+
+### Feeding inputs to a module: `nameSuburbs`
+
+As mentioned above, our next module requires two CSV files
+"suburbIDs.csv" and "rentalListings.csv". We will create two external
+inputs with these name which `conduit` will use to provide the module
+with its required inputs:
+
+```{r nameSuburbInputs}
+nameInput1 <- moduleInput(name = "renatlListings.csv", type = "external", 
+                          format = "CSV file")
+nameInput2 <- moduleInput("suburbIDs.csv", "external", "CSV file")
+```
+
+This module also has one source script, from the file
+[nameSuburbs.R](aucklandRent/src/nameSuburbs.R):
+
+```{r nameSuburbSource}
+nameSuburbsSource <- moduleSource(ref = file.path("aucklandRents", "src",
+                                                  "nameSuburbs.R"))
+
+```
+
+<span class="ann">TODO: UP TO HERE</span>
+
+```
+nameSuburbs <-
+    module(name = "nameSuburbs", platform = "R",
+           description = "name suburbs in rentalListings.csv using key in suburbIDs.csv",
+           inputs = list(
+               moduleInput("rentalListings.csv", "external", "CSV file"),
+               moduleInput("suburbIDs.csv", "external", "CSV file")),
+           sources = list(
+               moduleSource(ref = file.path(scripts, "src/nameSuburbs.R"))),
+           outputs=list(
+               moduleOutput("rentalListings", "internal", "R data frame")))
 ```
 
 The source script creates an 'R "graphNEL" object, `directedGraph`,

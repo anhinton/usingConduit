@@ -9,6 +9,8 @@
   <style type="text/css">
     div.main { margin: auto; max-width: 800px; }
     code{ white-space: pre-wrap; }
+    .ann {color: green; font-style: italic; background-color: silver; border: solid thin}
+    .mod {color: red; font-style: italic; background-color: silver; border: solid thin}
   </style>
   <style type="text/css">
 table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
@@ -64,8 +66,8 @@ Department of Statistics, The University of Auckland
 <li><a href="#outputs-in-conduit">Outputs in <em>conduit</em></a></li>
 <li><a href="#example-creating-a-pipeline-from-r-scripts">Example: creating a pipeline from R scripts</a><ul>
 <li><a href="#r-scripts">R scripts</a></li>
-<li><a href="#getting-data-into-conduit">Getting data into conduit</a></li>
-<li><a href="#creating-the-first-module-creategraph">Creating the first module: <code>createGraph</code></a></li>
+<li><a href="#getting-data-into-conduit-rentallistings-and-suburbids">Getting data into conduit: <code>rentalListings</code> and <code>suburbIDs</code></a></li>
+<li><a href="#feeding-inputs-to-a-module-namesuburbs">Feeding inputs to a module: <code>nameSuburbs</code></a></li>
 <li><a href="#the-second-module-layoutgraph">The second module: <code>layoutGraph</code></a></li>
 <li><a href="#the-last-module-plotgraph">The last module: <code>plotGraph</code></a></li>
 <li><a href="#creating-pipes">Creating <code>pipe</code>s</a></li>
@@ -458,7 +460,6 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 <p>External outputs should be easy to identify, as they will be explicitly named in the module's source script.</p>
 <h2 id="example-creating-a-pipeline-from-r-scripts">Example: creating a pipeline from R scripts</h2>
 <p>In this example I will demonstrate how a pipeline can be created using R scripts for the modules' source scripts. We will create a pipeline called &quot;aucklandRents&quot; which reads in prices of flat listings for various Auckland suburbs and creates a boxplot comparison of three of those suburbs. Our first two modules will be 'dummy' modules, which load CSV files into <code>conduit</code>; one CSV file contains rental prices indexed by suburb, and the other contains a key for the suburb indices. The next module uses the suburb key to name the suburbs in the price listings, and produces an R data frame of this. This R data frame is cropped to the suburbs of interest in the next module, then the final module produces a boxplot of the rental prices for each suburb remaining.</p>
-<p><span class="ann">TODO: I am up to here</span></p>
 <p><span class="ann">TODO: make mention of packages used</span></p>
 <h3 id="r-scripts">R scripts</h3>
 <p>The R scripts for our example are as follows:</p>
@@ -491,12 +492,43 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 ##         ylab = &quot;Rent per week ($)&quot;, main=&quot;Rental prices in Auckland&quot;)
 ## dev.off()</code></pre>
 <p>R users will notice that the first script calls for files <code>rentalListings.csv</code> and <code>suburbIDs.csv</code> but that no such objects have been created. These object will be named as an inputs for this module, and will be made available to the module's R script by the glue system. Similarly the data frame <code>rentalListings</code> will be named as an input for the second module.</p>
-<h3 id="getting-data-into-conduit">Getting data into conduit</h3>
-<p>This module needs to read data from two CSV files, <a href="aucklandRents/data/rentalListings.csv">rentalListings.csv</a> and <a href="suburbIDs.csv" class="uri">suburbIDs.csv</a>.</p>
-<h3 id="creating-the-first-module-creategraph">Creating the first module: <code>createGraph</code></h3>
-<p>The first module has one source script, from the file <a href="example1/scripts/createGraph.R">createGraph.R</a>:</p>
-<pre class="sourceCode r"><code class="sourceCode r">createGraphSource &lt;-<span class="st"> </span><span class="kw">moduleSource</span>(<span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;example1&quot;</span>, <span class="st">&quot;scripts&quot;</span>,
-                                                  <span class="st">&quot;createGraph.R&quot;</span>))</code></pre>
+<h3 id="getting-data-into-conduit-rentallistings-and-suburbids">Getting data into conduit: <code>rentalListings</code> and <code>suburbIDs</code></h3>
+<p>This module needs to read data from two CSV files, <a href="https://gist.github.com/anhinton/d174df68c7a050201841/raw/6370e0e970f4d59fe788ec12748f6232b278f85c/rentalListings.csv">rentalListings.csv</a> and <a href="https://gist.github.com/anhinton/d174df68c7a050201841/raw/11b510fca1c27cc965fb9c68bc391ae04d868a6e/suburbIDs.csv">suburbIDs.csv</a>. For each CSV file we will create a dummy module which provides the file as an external output.</p>
+<p>The <code>rentalListings</code> module will have one output, our pre-existing CSV:</p>
+<pre class="sourceCode r"><code class="sourceCode r">rentalListingsOutput &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">moduleOutput</span>(<span class="dt">name =</span> <span class="st">&quot;rentalListings.csv&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;external&quot;</span>,
+                 <span class="dt">format =</span> <span class="st">&quot;CSV file&quot;</span>,
+                 <span class="dt">ref =</span> <span class="st">&quot;https://gist.github.com/anhinton/d174df68c7a050201841/raw/6370e0e970f4d59fe788ec12748f6232b278f85c/rentalListings.csv&quot;</span>)</code></pre>
+<p>We will create the <code>rentalListings</code> module as follows:</p>
+<pre class="sourceCode r"><code class="sourceCode r">rentalListings &lt;-
+<span class="st">    </span><span class="kw">module</span>(<span class="dt">name =</span> <span class="st">&quot;rentalListings&quot;</span>, <span class="dt">platform =</span> <span class="st">&quot;R&quot;</span>,
+           <span class="dt">description =</span> <span class="st">&quot;load rentalListings.csv into session&quot;</span>,
+           <span class="dt">outputs =</span> <span class="kw">list</span>(rentalListingsOutput))</code></pre>
+<p>The `suburbIDs module is created similarly:</p>
+<pre class="sourceCode r"><code class="sourceCode r">suburbIDs &lt;-
+<span class="st">    </span><span class="kw">module</span>(<span class="st">&quot;suburbIDs&quot;</span>, <span class="st">&quot;R&quot;</span>, <span class="st">&quot;load suburbIDs.csv into session&quot;</span>,
+           <span class="dt">outputs =</span> <span class="kw">list</span>(
+               <span class="kw">moduleOutput</span>(<span class="st">&quot;suburbIDs.csv&quot;</span>, <span class="st">&quot;external&quot;</span>, <span class="st">&quot;CSV file&quot;</span>,
+                            <span class="dt">ref =</span> <span class="st">&quot;https://gist.github.com/anhinton/d174df68c7a050201841/raw/11b510fca1c27cc965fb9c68bc391ae04d868a6e/suburbIDs.csv&quot;</span>)))</code></pre>
+<h3 id="feeding-inputs-to-a-module-namesuburbs">Feeding inputs to a module: <code>nameSuburbs</code></h3>
+<p>As mentioned above, our next module requires two CSV files &quot;suburbIDs.csv&quot; and &quot;rentalListings.csv&quot;. We will create two external inputs with these name which <code>conduit</code> will use to provide the module with its required inputs:</p>
+<pre class="sourceCode r"><code class="sourceCode r">nameInput1 &lt;-<span class="st"> </span><span class="kw">moduleInput</span>(<span class="dt">name =</span> <span class="st">&quot;renatlListings.csv&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;external&quot;</span>, 
+                          <span class="dt">format =</span> <span class="st">&quot;CSV file&quot;</span>)
+nameInput2 &lt;-<span class="st"> </span><span class="kw">moduleInput</span>(<span class="st">&quot;suburbIDs.csv&quot;</span>, <span class="st">&quot;external&quot;</span>, <span class="st">&quot;CSV file&quot;</span>)</code></pre>
+<p>This module also has one source script, from the file <a href="aucklandRent/src/nameSuburbs.R">nameSuburbs.R</a>:</p>
+<pre class="sourceCode r"><code class="sourceCode r">nameSuburbsSource &lt;-<span class="st"> </span><span class="kw">moduleSource</span>(<span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;aucklandRents&quot;</span>, <span class="st">&quot;src&quot;</span>,
+                                                  <span class="st">&quot;nameSuburbs.R&quot;</span>))</code></pre>
+<p><span class="ann">TODO: UP TO HERE</span></p>
+<pre><code>nameSuburbs &lt;-
+    module(name = &quot;nameSuburbs&quot;, platform = &quot;R&quot;,
+           description = &quot;name suburbs in rentalListings.csv using key in suburbIDs.csv&quot;,
+           inputs = list(
+               moduleInput(&quot;rentalListings.csv&quot;, &quot;external&quot;, &quot;CSV file&quot;),
+               moduleInput(&quot;suburbIDs.csv&quot;, &quot;external&quot;, &quot;CSV file&quot;)),
+           sources = list(
+               moduleSource(ref = file.path(scripts, &quot;src/nameSuburbs.R&quot;))),
+           outputs=list(
+               moduleOutput(&quot;rentalListings&quot;, &quot;internal&quot;, &quot;R data frame&quot;)))</code></pre>
 <p>The source script creates an 'R &quot;graphNEL&quot; object, <code>directedGraph</code>, which we will name as an internal output:</p>
 <pre class="sourceCode r"><code class="sourceCode r">createGraphOutput &lt;-<span class="st"> </span><span class="kw">moduleOutput</span>(<span class="dt">name =</span> <span class="st">&quot;directedGraph&quot;</span>,
                                   <span class="dt">type =</span> <span class="st">&quot;internal&quot;</span>,
