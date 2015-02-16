@@ -722,22 +722,22 @@ suburb remaining.
 
 The R scripts for our example are as follows: 
 
-  + [nameSuburbs.R](aucklandRents/scripts/nameSuburbs.R):
+  + [nameSuburbs.R](aucklandRents/src/nameSuburbs.R):
 
 ```{r nameSuburbsScript, echo=FALSE}
-cat(readLines("aucklandRents/scripts/nameSuburbs.R"), sep="\n")
+cat(readLines("aucklandRents/src/nameSuburbs.R"), sep="\n")
 ```
     
-  + [chooseSuburbs.R](aucklandRents/scripts/chooseSuburbs.R):
+  + [chooseSuburbs.R](aucklandRents/src/chooseSuburbs.R):
 
 ```{r chooseSuburbsScript, echo=FALSE}
-cat(readLines("aucklandRents/scripts/chooseSuburbs.R"), sep="\n")
+cat(readLines("aucklandRents/src/chooseSuburbs.R"), sep="\n")
 ```
     
-  + [boxplotBySuburb.R](aucklandRents/scripts/boxplotBySuburb.R):
+  + [boxplotBySuburb.R](aucklandRents/src/boxplotBySuburb.R):
 
 ```{r boxplotBySuburbScript, echo=FALSE}
-cat(readLines("aucklandRents/scripts/boxplotBySuburb.R"), sep="\n")
+cat(readLines("aucklandRents/src/boxplotBySuburb.R"), sep="\n")
 ```
 
 R users will notice that the first script calls for files
@@ -746,6 +746,10 @@ been created. These object will be named as an inputs for this module,
 and will be made available to the module's R script by the glue
 system. Similarly the data frame `rentalListings` will be named as an
 input for the second module.
+
+### Getting data into conduit
+
+This module needs to read data from two CSV files, [rentalListings.csv](aucklandRents/data/
 
 ### Creating the first module: `createGraph`
 
