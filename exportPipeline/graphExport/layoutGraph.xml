@@ -5,7 +5,8 @@
   <input name="myGraph" type="internal">
     <format formatType="text">R "graphNEL" object</format>
   </input>
-  <source ref="example1/scripts/layoutGraph.R" path=".//|${ROOT}"/>
+  <source><![CDATA[library(Rgraphviz)
+Ragraph <- agopen(myGraph, "myGraph")]]></source>
   <output name="Ragraph" type="internal">
     <format formatType="text">R "Ragraph" object</format>
   </output>

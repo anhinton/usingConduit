@@ -72,7 +72,8 @@ directory called 'simpleGraph'.
 ```{r loadPipelineFalse}
 ## load the simpleGraph pipeline
 simpleGraph <- 
-    loadPipeline(name = "simpleGraph", ref="simpleGraph/pipeline.xml")
+    loadPipeline(name = "simpleGraph", 
+                 ref = normalizePath(file.path("simpleGraph", "pipeline.xml")))
 ```	
 
 According to its `description`:
@@ -95,6 +96,8 @@ pipeline will create output in a named directory found in
 
 ```{r runPipeline}
 ## run the simpleGraph pipeline
+validatePipeline(simpleGraph)
+conduit:::graphPipeline(simpleGraph)
 runPipeline(simpleGraph)
 ```
 
@@ -102,7 +105,7 @@ This creates the following files:
 
 ```{r pipelineOutput, echo=FALSE, results = "asis"}
 all_files <- list.files(recursive = TRUE, all.files = TRUE)
-pipeline_files <- all_files[grep("^pipelines", all_files)]
+pipeline_files <- all_files[grep("^pipelines/simpleGraph", all_files)]
 pipeline_file_links <- paste0(" ", seq_along(pipeline_files), ". [", 
                          pipeline_files, "](", pipeline_files, ")")
 exampleGraph <- grep("example.png$", pipeline_files)
@@ -404,7 +407,8 @@ Example:
 
 ```{r loadPipelineExample}
 simpleGraph <- loadPipeline(name = "simpleGraph",
-                            ref = file.path("simpleGraph", "pipeline.xml"))
+                            ref = normalizePath(
+                                file.path("simpleGraph", "pipeline.xml")))
 ```
 
 ### Creating pipelines
@@ -547,8 +551,9 @@ Examples:
 Running a component with no inputs:
 
 ```{r runComponentExample1}
-simpleGraph <- loadPipeline("simpleGraph",
-                            file.path("simpleGraph", "pipeline.xml"))
+simpleGraph <- 
+    loadPipeline("simpleGraph",
+                 normalizePath(file.path("simpleGraph", "pipeline.xml")))
 names(simpleGraph$components)
 runComponent(componentName = "createGraph", pipeline = simpleGraph)
 ```
@@ -560,8 +565,9 @@ The component's output can be found at:
 Running a component with one input:
 
 ```{r runComponentExample2}
-simpleGraph <- loadPipeline("simpleGraph",
-                            file.path("simpleGraph", "pipeline.xml"))
+simpleGraph <- 
+    loadPipeline("simpleGraph",
+                 normalizePath(file.path("simpleGraph", "pipeline.xml")))
 runComponent("layoutGraph", simpleGraph,
              inputs = 
                  list(myGraph =
@@ -598,8 +604,9 @@ if (!file.exists("savePipeline")) {
 ```
 
 ```{r savePipelineExample}
-simpleGraph <- loadPipeline("simpleGraph",
-                            file.path("simpleGraph", "pipeline.xml"))
+simpleGraph <- 
+    loadPipeline("simpleGraph",
+                 normalizePath(file.path("simpleGraph", "pipeline.xml")))
 savePipeline(pipeline = simpleGraph, targetDirectory = "savePipeline")
 ```
 
@@ -625,8 +632,9 @@ if (!file.exists("exportPipeline")) {
 ```
 
 ```{r exportPipelineExample}
-simpleGraph <- loadPipeline("graphExport",
-                            file.path("simpleGraph", "pipeline.xml"))
+simpleGraph <- 
+    loadPipeline("graphExport",
+                 normalizePath(file.path("simpleGraph", "pipeline.xml")))
 exportPipeline(pipeline = simpleGraph, targetDirectory = "exportPipeline")
 ```
 
@@ -748,22 +756,25 @@ input for the second module.
 ### Getting data into conduit: `rentalListings` and `suburbIDs`
 
 This module needs to read data from two CSV files,
-[rentalListings.csv](https://gist.github.com/anhinton/d174df68c7a050201841/raw/6370e0e970f4d59fe788ec12748f6232b278f85c/rentalListings.csv)
+[rentalListings.csv](aucklandRents/data/rentalListings.csv)
 and
-[suburbIDs.csv](https://gist.github.com/anhinton/d174df68c7a050201841/raw/11b510fca1c27cc965fb9c68bc391ae04d868a6e/suburbIDs.csv). For
+[suburbIDs.csv](aucklandRents/data/suburbIDs.csv). For
 each CSV file we will create a dummy module which provides the file as
 an external output.
 
-The `rentalListings` module will have one output, our pre-existing CSV:
+The `rentalListings` module will have one output, our first CSV
+file. External outputs for dummy modules require an absolute file path
+for `ref`:
 
 ``` {r rentalListingsOutput}
 rentalListingsOutput <- 
     moduleOutput(name = "rentalListings.csv", type = "external",
                  format = "CSV file",
-                 ref = "https://gist.github.com/anhinton/d174df68c7a050201841/raw/6370e0e970f4d59fe788ec12748f6232b278f85c/rentalListings.csv")
+                 ref = normalizePath(file.path("aucklandRents", "data",
+                                               "rentalListings.csv")))
 ```
 
-We will create the `rentalListings` module as follows:
+We then create the `rentalListings` module as follows:
 
 ```{r rentalListingsModule}
 rentalListings <-
@@ -772,14 +783,16 @@ rentalListings <-
            outputs = list(rentalListingsOutput))
 ```
 
-The `suburbIDs module is created similarly:
+The `suburbIDs` module is created similarly:
 
 ```{r suburbIDsModule}
 suburbIDs <-
     module("suburbIDs", "R", "load suburbIDs.csv into session",
            outputs = list(
                moduleOutput("suburbIDs.csv", "external", "CSV file",
-                            ref = "https://gist.github.com/anhinton/d174df68c7a050201841/raw/11b510fca1c27cc965fb9c68bc391ae04d868a6e/suburbIDs.csv")))
+                            ref = normalizePath(
+                                file.path("aucklandRents", "data",
+                                          "suburbIDs.csv")))))
 ```
 
 ### Feeding inputs to a module: `nameSuburbs`
@@ -789,10 +802,11 @@ As mentioned above, our next module requires two CSV files
 inputs with these name which `conduit` will use to provide the module
 with its required inputs:
 
-```{r nameSuburbInputs}
-nameInput1 <- moduleInput(name = "renatlListings.csv", type = "external", 
-                          format = "CSV file")
-nameInput2 <- moduleInput("suburbIDs.csv", "external", "CSV file")
+```{r nameSuburbsInputs}
+nameSuburbsInputs <- list(
+    moduleInput(name = "rentalListings.csv", type = "external", 
+                format = "CSV file"),
+    moduleInput("suburbIDs.csv", "external", "CSV file"))
 ```
 
 This module also has one source script, from the file
@@ -804,106 +818,81 @@ nameSuburbsSource <- moduleSource(ref = file.path("aucklandRents", "src",
 
 ```
 
-<span class="ann">TODO: UP TO HERE</span>
+The source script creates an 'R data frame' object, `rentalListings`,
+which we will name as an internal output:
 
+```{r nameSuburbOutput}
+nameSuburbsOutput <- 
+    moduleOutput("rentalListings", "internal", "R data frame")
 ```
+
+Now we can create a module object, `nameSuburbs`, with the name
+"nameSuburbs", a description, and the inputs, source and output
+created above:
+
+``` {r nameSuburbsModule}
 nameSuburbs <-
     module(name = "nameSuburbs", platform = "R",
            description = "name suburbs in rentalListings.csv using key in suburbIDs.csv",
+           inputs = nameSuburbsInputs,
+           sources = list(nameSuburbsSource),
+           outputs = list(nameSuburbsOutput))
+```
+
+### The `chooseSuburbs` module
+
+This module has one input, an 'R data frame' `rentalListings`, and one
+source from the file
+[chooseSuburbs.R](aucklandRents/src/chooseSuburbs.R). This source
+replaces the `rentalListings` object with a smaller data frame of
+rental listing from three specific suburbs. We will name
+`rentalListings` as an internal output:
+
+```{r chooseSuburbsModule}
+chooseSuburbs <-
+    module(name = "chooseSuburbs", platform = "R",
+           description = "produces a data frame of rent prices for the named suburbs",
            inputs = list(
-               moduleInput("rentalListings.csv", "external", "CSV file"),
-               moduleInput("suburbIDs.csv", "external", "CSV file")),
+               moduleInput("rentalListings", "internal", "R data frame")),
            sources = list(
-               moduleSource(ref = file.path(scripts, "src/nameSuburbs.R"))),
-           outputs=list(
+               moduleSource(ref = file.path("aucklandRents", "src", 
+                                            "chooseSuburbs.R"))),
+           outputs = list(
                moduleOutput("rentalListings", "internal", "R data frame")))
 ```
 
-The source script creates an 'R "graphNEL" object, `directedGraph`,
-which we will name as an internal output:
+### The last module: `boxplotBySuburb`
 
-```{r createGraphOutput}
-createGraphOutput <- moduleOutput(name = "directedGraph",
-                                  type = "internal",
-                                  format = "R \"graphNEL\" object")
-```
-
-Now we can create a module object, `createGraph`, with the name,
-"createGraph", a description, and the source and output created above:
-
-```{r createGraphModule}
-createGraph <- 
-    module(name = "createGraph",
-           platform = "R",
-           description = "Create a simple directed graphNEL graph object with four nodes and four edges",
-           sources = 
-               list(createGraphSource),
-           outputs = 
-               list(createGraphOutput))
-```
-
-### The second module: `layoutGraph`
-
-As mentioned above, our second module script requires a "graphNEL"
-object, `myGraph`. We will create our module with an internal input
-called `myGraph` which *conduit* will use to provide this module with
-its required object:
-
-```{r layoutGraphInput}
-layoutGraphInput <- moduleInput(name = "myGraph",
-                                type = "internal",
-                                format = "R \"graphNEL\" object")
-```
-
-This module has one source, from the file
-[layoutGraph.R](example1/scripts/layoutGraph.R), which produces an
-"Ragraph" object, `Ragraph`. We will name `Ragraph` as an output. We
-create the module with the following code:
-
-```{r layoutGraphModule}
-layoutGraph <-
-    module(name = "layoutGraph",
-           platform = "R",
-           description = "Lays out a graphNEL graph using the Rgraphviz package",
-           inputs = list(layoutGraphInput),
-           sources = list(moduleSource(ref = file.path("example1", "scripts",
-                                                       "layoutGraph.R"))),
-           outputs = list(moduleOutput(name = "Ragraph",
-                                       type = "internal",
-                                       format = "R \"Ragraph\" object")))
-```
-
-### The last module: `plotGraph`
-
-The final script creates a PNG file, named "example.png", in the
-current working directory. We will create an external output for this
-module, called "example.png", and record the filename as the output's
+The final script creates an SVG file, named
+"boxplot-rentBySuburb.svg", in the current working directory. We will
+create an external output for this module, named
+"boxplot-rentBySuburb.svg", and record the filename as the output's
 `ref`:
 
-```{r plotGraphOutput}
-plotGraphOutput <- moduleOutput(name = "example.png",
-                                type = "external",
-                                ref = "example.png",
-                                format = "PNG image file")
+```{r boxplotBySuburbOutput}
+boxplotBySuburbOutput <- 
+    moduleOutput(name = "boxplot-rentBySuburb.svg",
+                 type = "external",
+                 ref = "boxplot-rentBySuburb.svg",
+                 format = "SVG image file")
 ```
 
 
 This module has one source script, from the file
-[plotGraph.R](example1/scripts/plotGraph.R). This script requires an
-"Ragraph" object, `Ragraph`. We create the module `plotGraph` with the
-following code:
+[boxplotBySuburb.R](aucklandRents/src/boxplotBySuburb.R). This script
+requires an "R data frame" object, `rentalListings`. We create the module
+`plotGraph` with the following code:
 
-```{r plotGraphModule}
-plotGraph <- 
-    module(name = "plotGraph",
-           platform = "R",
-           description = "Plots an Ragraph object to a PNG file using the gridGraphviz package",
-           inputs = list(moduleInput(name = "Ragraph",
-                                     type = "internal",
-                                     format = "R \"Ragraph\" object")),
-           sources = list(moduleSource(ref = file.path("example1", "scripts",
-                                                       "plotGraph.R"))),
-           outputs = list(plotGraphOutput))
+```{r boxplotBySuburbModule}
+boxplotBySuburb <-
+    module("boxplotBySuburb", platform="R",
+           inputs=list(
+               moduleInput("rentalListings", "internal", "R data frame")),
+           sources=list(
+               moduleSource(
+                   ref=file.path("aucklandRents", "src", 
+                                 "boxplotBySuburb.R"))),
+           outputs=list(boxplotBySuburbOutput))
 ```
 
 ### Creating `pipe`s
@@ -912,49 +901,91 @@ A pipeline consists of a set of components, and a set of pipes describing
 how component outputs are connected to other component inputs. The modules
 created above are our components; we will now create our pipes.
 
-The `createGraph` module has an internal output, "directedGraph", a
-'graphNEL' object. We would like our pipeline to pass this output to
-the `layoutGraph` module, which requires a 'graphNEL' object called
-"myGraph" as an internal input. The following code will create this
-pipe:
+The dummy module `rentalListings` has an external output
+"rentalListings.csv", a "CSV file". We would like our pipeline to pas
+this output to the `nameSuburbs` module, which requires the "CSV
+file" external input "rentalListings.csv"`. The following code
+generates a pipe which makes this connection:
 
 ```{r createPipe1}
-pipe1 <- pipe(startComponent = "createGraph", startOutput = "directedGraph",
-              endComponent = "layoutGraph", endInput = "myGraph")
+pipe1 <- pipe("rentalListings", "rentalListings.csv",
+              "nameSuburbs", "rentalListings.csv")
 ```
 
-We also need a pipe connecting the internal output "Ragraph" in
-`layoutGraph` to the internal input "Ragraph" in `plotGraph`. This is
-done with the following code:
+Similarly, we need a pipe connecting "suburbIDs.csv" from `suburbIDs`
+to "suburbIDs.csv" in `nameSuburbs`:
 
 ```{r createPipe2}
-pipe2 <- pipe(startComponent = "layoutGraph", startOutput = "Ragraph",
-              endComponent = "plotGraph", endInput = "Ragraph")
+pipe2 <- pipe("suburbIDs", "suburbIDs.csv",
+              "nameSuburbs", "suburbIDs.csv")
 ```
 
-### Creating the `simpleGraph` pipeline
+Two more pipes are required, connecting "rentalListings" from
+`nameSuburbs` to "rentalListings" in `chooseSuburbs`, connection
+"rentalListings" from `chooseSuburbs` to "rentalListings" in
+`boxplotBySuburbs`.
 
-We now have all the necessary pieces to create our `simpleGraph`
+```{r createPipe3}
+pipe3 <- pipe("nameSuburbs", "rentalListings",
+              "chooseSuburbs", "rentalListings")
+pipe4 <- pipe("chooseSuburbs", "rentalListings",
+              "boxplotBySuburb", "rentalListings")
+```
+
+
+
+### Creating the `aucklandRents` pipeline
+
+We now have all the necessary pieces to create our `aucklandRents`
 pipeline. We have our list of components:
 
 ```{r componentsList}
-componentsList <- list(createGraph, layoutGraph, plotGraph)
+componentsList <- list(rentalListings, suburbIDs, nameSuburbs,
+                       chooseSuburbs, boxplotBySuburb)
 ```
 
 and our list of pipes:
 
 ```{r pipesList}
-pipesList <- list(pipe1, pipe2)
+pipesList <- list(pipe1, pipe2, pipe3, pipe4)
 ```
 
 The following code creates our pipeline object:
 
 ```{r simpleGraphPipeline}
-simpleGraph <- pipeline(name = "simpleGraph",
-                        description = "This pipeline creates a directed graphNEL graph, lays it out using the Rgraphviz package, and then plots the graph as a PNG file using the gridGraphviz package",
-                        components = componentsList,
-                        pipes = pipesList)
+aucklandRents <- pipeline(name = "aucklandRents",
+                          description = "",
+                          components = componentsList,
+                          pipes = pipesList)
 ```
+
+### Running the `aucklandRents` pipeline
+
+Now we can run our pipeline:
+
+```{r aucklandRentsRun}
+runPipeline(aucklandRents)
+```
+
+This creates the following files:
+
+```{r aucklandRentsOutput, echo=FALSE, results = "asis"}
+all_files <- list.files(recursive = TRUE, all.files = TRUE)
+pipeline_files <- all_files[grep("^pipelines/aucklandRents", all_files)]
+pipeline_file_links <- paste0(" ", seq_along(pipeline_files), ". [", 
+                         pipeline_files, "](", pipeline_files, ")")
+exampleGraph <- grep("boxplot-rentBySuburb.svg$", pipeline_files)
+cat(pipeline_file_links, sep="\n")
+```
+
+File number `r exampleGraph`, `r substr(pipeline_file_links[exampleGraph], 5, 
+                   nchar(pipeline_file_links[exampleGraph]))`,
+is the output file we require, the SVG image of the plot. The image is shown
+below:
+
+![Pipeline output: `aucklandRents` plot](`r pipeline_files[exampleGraph]`)
+
+<span class="ann">TODO: 2015-02-17: UP TO HERE</span>
 
 ### Exporting the `simpleGraph` pipeline to XML
 

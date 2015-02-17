@@ -68,10 +68,11 @@ Department of Statistics, The University of Auckland
 <li><a href="#r-scripts">R scripts</a></li>
 <li><a href="#getting-data-into-conduit-rentallistings-and-suburbids">Getting data into conduit: <code>rentalListings</code> and <code>suburbIDs</code></a></li>
 <li><a href="#feeding-inputs-to-a-module-namesuburbs">Feeding inputs to a module: <code>nameSuburbs</code></a></li>
-<li><a href="#the-second-module-layoutgraph">The second module: <code>layoutGraph</code></a></li>
-<li><a href="#the-last-module-plotgraph">The last module: <code>plotGraph</code></a></li>
+<li><a href="#the-choosesuburbs-module">The <code>chooseSuburbs</code> module</a></li>
+<li><a href="#the-last-module-boxplotbysuburb">The last module: <code>boxplotBySuburb</code></a></li>
 <li><a href="#creating-pipes">Creating <code>pipe</code>s</a></li>
-<li><a href="#creating-the-simplegraph-pipeline">Creating the <code>simpleGraph</code> pipeline</a></li>
+<li><a href="#creating-the-aucklandrents-pipeline">Creating the <code>aucklandRents</code> pipeline</a></li>
+<li><a href="#running-the-aucklandrents-pipeline">Running the <code>aucklandRents</code> pipeline</a></li>
 <li><a href="#exporting-the-simplegraph-pipeline-to-xml">Exporting the <code>simpleGraph</code> pipeline to XML</a></li>
 </ul></li>
 <li><a href="#example-combining-r-and-python-scripts">Example: combining R and python scripts</a></li>
@@ -94,21 +95,32 @@ devtools::<span class="kw">install_github</span>(<span class="st">&quot;anhinton
 <p><span class="ann">TODO: better describe pipeline example</span></p>
 <pre class="sourceCode r"><code class="sourceCode r">## load the simpleGraph pipeline
 simpleGraph &lt;-<span class="st"> </span>
-<span class="st">    </span><span class="kw">loadPipeline</span>(<span class="dt">name =</span> <span class="st">&quot;simpleGraph&quot;</span>, <span class="dt">ref=</span><span class="st">&quot;simpleGraph/pipeline.xml&quot;</span>)</code></pre>
-<pre><code>## Warning in findFile(ref, path, location): Found more than one match for simpleGraph/pipeline.xml /home/ahin017/files.fos/openapi/documentation/usingConduit/example1/simpleGraph/pipeline.xml
-## Found more than one match for simpleGraph/pipeline.xml /home/ahin017/files.fos/openapi/documentation/usingConduit/simpleGraph/pipeline.xml</code></pre>
+<span class="st">    </span><span class="kw">loadPipeline</span>(<span class="dt">name =</span> <span class="st">&quot;simpleGraph&quot;</span>, 
+                 <span class="dt">ref =</span> <span class="kw">normalizePath</span>(<span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>)))</code></pre>
 <p>According to its <code>description</code>:</p>
 <pre><code>This pipeline creates a directed graphNEL graph, lays it out using the Rgraphviz package, and then plots the graph as a PNG file using the gridGraphviz package</code></pre>
 <h3 id="run-a-pipeline-in-conduit">Run a pipeline in <em>conduit</em></h3>
 <p>The <code>runPipeline()</code> function is used to run a <code>pipeline</code> object in R. It requires a <code>pipeline</code> object as its only argument. This function will create a directory for the pipeline in the 'pipelines' sub-directory of the current working directory. If a 'pipelines' sub-directory does not exist it will be created. Each module in the pipeline will create output in a named directory found in ./pipelines/PIPELINE_NAME/modules.</p>
 <pre class="sourceCode r"><code class="sourceCode r">## run the simpleGraph pipeline
-<span class="kw">runPipeline</span>(simpleGraph)</code></pre>
-<pre><code>## Error in .Object@nodes &lt;- nodes: could not find function &quot;checkAtAssignment&quot;</code></pre>
+<span class="kw">validatePipeline</span>(simpleGraph)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">conduit:::<span class="kw">graphPipeline</span>(simpleGraph)</code></pre>
+<pre><code>## A graphNEL graph with directed edges
+## Number of Nodes = 3 
+## Number of Edges = 2</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runPipeline</span>(simpleGraph)</code></pre>
 <p>This creates the following files:</p>
-<p>. <a href=""></a></p>
-<p>File number , is the output file we require, the PNG image of the graph. The image is shown below:</p>
+<ol style="list-style-type: decimal">
+<li><a href="pipelines/simpleGraph/modules/createGraph/directedGraph.rds" class="uri">pipelines/simpleGraph/modules/createGraph/directedGraph.rds</a></li>
+<li><a href="pipelines/simpleGraph/modules/createGraph/script.R" class="uri">pipelines/simpleGraph/modules/createGraph/script.R</a></li>
+<li><a href="pipelines/simpleGraph/modules/layoutGraph/Ragraph.rds" class="uri">pipelines/simpleGraph/modules/layoutGraph/Ragraph.rds</a></li>
+<li><a href="pipelines/simpleGraph/modules/layoutGraph/script.R" class="uri">pipelines/simpleGraph/modules/layoutGraph/script.R</a></li>
+<li><a href="pipelines/simpleGraph/modules/plotGraph/example.png" class="uri">pipelines/simpleGraph/modules/plotGraph/example.png</a></li>
+<li><a href="pipelines/simpleGraph/modules/plotGraph/script.R" class="uri">pipelines/simpleGraph/modules/plotGraph/script.R</a></li>
+</ol>
+<p>File number 5, <a href="pipelines/simpleGraph/modules/plotGraph/example.png" class="uri">pipelines/simpleGraph/modules/plotGraph/example.png</a> is the output file we require, the PNG image of the graph. The image is shown below:</p>
 <div class="figure">
-<img src="" alt="Pipeline output: PNG image file of graph" />
+<img src="pipelines/simpleGraph/modules/plotGraph/example.png" alt="Pipeline output: PNG image file of graph" />
 <p class="caption">Pipeline output: PNG image file of graph</p>
 </div>
 <hr />
@@ -264,14 +276,14 @@ myGraph &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span cl
 tempTarget &lt;-<span class="st"> </span><span class="kw">tempdir</span>()
 <span class="kw">saveModule</span>(<span class="dt">module =</span> createGraph, <span class="dt">targetDirectory =</span> tempTarget,
            <span class="dt">filename =</span> <span class="st">&quot;newCreateGraph.xml&quot;</span>)</code></pre>
-<pre><code>## [1] &quot;/tmp/RtmpWYyXtu/newCreateGraph.xml&quot;</code></pre>
+<pre><code>## [1] &quot;/tmp/Rtmp2TPVsz/newCreateGraph.xml&quot;</code></pre>
 <p>Save a module to XML without specifiying the filename:</p>
 <pre class="sourceCode r"><code class="sourceCode r">layoutGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="st">&quot;layoutGraph&quot;</span>, 
                           <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;layoutGraph.xml&quot;</span>))
 layoutGraph$name</code></pre>
 <pre><code>## [1] &quot;layoutGraph&quot;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">saveModule</span>(<span class="dt">module =</span> layoutGraph, <span class="dt">targetDirectory =</span> tempTarget)</code></pre>
-<pre><code>## [1] &quot;/tmp/RtmpWYyXtu/layoutGraph.xml&quot;</code></pre>
+<pre><code>## [1] &quot;/tmp/Rtmp2TPVsz/layoutGraph.xml&quot;</code></pre>
 <h2 id="pipelines">Pipelines</h2>
 <p>This sections describes how to: load pipelines from XML files; create pipelines ; execute pipeline components; save pipelines and their components as XML files.</p>
 <h3 id="loading-pipelines-from-xml">Loading pipelines from XML</h3>
@@ -287,9 +299,8 @@ layoutGraph$name</code></pre>
 <p><code>loadPipeline()</code> also accepts a <code>namespaces</code> argument, which should be a named character vector of namespaces used in the pipeline XML file. The default value for <code>namespaces</code> is <code>c(oa = &quot;http://www.openapi.org/2014/&quot;))</code>.</p>
 <p>Example:</p>
 <pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span><span class="kw">loadPipeline</span>(<span class="dt">name =</span> <span class="st">&quot;simpleGraph&quot;</span>,
-                            <span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>))</code></pre>
-<pre><code>## Warning in findFile(ref, path, location): Found more than one match for simpleGraph/pipeline.xml /home/ahin017/files.fos/openapi/documentation/usingConduit/example1/simpleGraph/pipeline.xml
-## Found more than one match for simpleGraph/pipeline.xml /home/ahin017/files.fos/openapi/documentation/usingConduit/simpleGraph/pipeline.xml</code></pre>
+                            <span class="dt">ref =</span> <span class="kw">normalizePath</span>(
+                                <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>)))</code></pre>
 <h3 id="creating-pipelines">Creating pipelines</h3>
 <p>Pipelines can be created using the <code>pipeline()</code> function, and its associated helper functions. The resulting <code>pipeline</code> objects can be executed using <em>conduit</em>, or saved to disk as XML files.</p>
 <h4 id="pipeline"><code>pipeline()</code></h4>
@@ -365,7 +376,6 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 <pre><code>## Warning in findFile(ref, path, location): Found more than one match for simpleGraph/pipeline.xml /home/ahin017/files.fos/openapi/documentation/usingConduit/example1/simpleGraph/pipeline.xml
 ## Found more than one match for simpleGraph/pipeline.xml /home/ahin017/files.fos/openapi/documentation/usingConduit/simpleGraph/pipeline.xml</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runPipeline</span>(simpleGraph)</code></pre>
-<pre><code>## Error in .Object@nodes &lt;- nodes: could not find function &quot;checkAtAssignment&quot;</code></pre>
 <h4 id="runcomponent"><code>runComponent()</code></h4>
 <p>Individual components in a pipeline can be executed using the <code>runComponent()</code> function. This can be useful for testing a pipeline. This function requires two arguments:</p>
 <ul>
@@ -376,12 +386,11 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 <p><code>runComponent()</code> will place component output in either a 'modules' or 'pipelines' directory, depending on the type of component. The location of this output directory can be specified using the <code>pipelinePath</code> argument.</p>
 <p>Examples:</p>
 <p>Running a component with no inputs:</p>
-<pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span><span class="kw">loadPipeline</span>(<span class="st">&quot;simpleGraph&quot;</span>,
-                            <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>))</code></pre>
-<pre><code>## Warning in findFile(ref, path, location): Found more than one match for simpleGraph/pipeline.xml /home/ahin017/files.fos/openapi/documentation/usingConduit/example1/simpleGraph/pipeline.xml
-## Found more than one match for simpleGraph/pipeline.xml /home/ahin017/files.fos/openapi/documentation/usingConduit/simpleGraph/pipeline.xml</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">names</span>(simpleGraph$components)</code></pre>
-<pre><code>## [1] &quot;createGraph&quot; &quot;layoutGraph&quot; &quot;plotGraph&quot;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">loadPipeline</span>(<span class="st">&quot;simpleGraph&quot;</span>,
+                 <span class="kw">normalizePath</span>(<span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>)))
+<span class="kw">names</span>(simpleGraph$components)</code></pre>
+<pre><code>## [1] &quot;plotGraph&quot;   &quot;createGraph&quot; &quot;layoutGraph&quot;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runComponent</span>(<span class="dt">componentName =</span> <span class="st">&quot;createGraph&quot;</span>, <span class="dt">pipeline =</span> simpleGraph)</code></pre>
 <pre><code>## [1] 0</code></pre>
 <p>The component's output can be found at:</p>
@@ -389,11 +398,10 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 <li><a href="modules/createGraph/directedGraph.rds">directedGraph.rds</a></li>
 </ul>
 <p>Running a component with one input:</p>
-<pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span><span class="kw">loadPipeline</span>(<span class="st">&quot;simpleGraph&quot;</span>,
-                            <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>))</code></pre>
-<pre><code>## Warning in findFile(ref, path, location): Found more than one match for simpleGraph/pipeline.xml /home/ahin017/files.fos/openapi/documentation/usingConduit/example1/simpleGraph/pipeline.xml
-## Found more than one match for simpleGraph/pipeline.xml /home/ahin017/files.fos/openapi/documentation/usingConduit/simpleGraph/pipeline.xml</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runComponent</span>(<span class="st">&quot;layoutGraph&quot;</span>, simpleGraph,
+<pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">loadPipeline</span>(<span class="st">&quot;simpleGraph&quot;</span>,
+                 <span class="kw">normalizePath</span>(<span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>)))
+<span class="kw">runComponent</span>(<span class="st">&quot;layoutGraph&quot;</span>, simpleGraph,
              <span class="dt">inputs =</span> 
                  <span class="kw">list</span>(<span class="dt">myGraph =</span>
                           <span class="kw">normalizePath</span>(
@@ -409,11 +417,10 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 <h4 id="savepipeline"><code>savePipeline()</code></h4>
 <p>A pipeline can be saved to an XML file using <code>savePipeline()</code>. The <code>pipeline</code> argument must be provided with a <code>pipeline</code> object. The resulting xml file is always called <code>pipeline.xml</code>. The location of this file can be set using the <code>targetDirectory</code> argument.</p>
 <p>Example:</p>
-<pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span><span class="kw">loadPipeline</span>(<span class="st">&quot;simpleGraph&quot;</span>,
-                            <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>))</code></pre>
-<pre><code>## Warning in findFile(ref, path, location): Found more than one match for simpleGraph/pipeline.xml /home/ahin017/files.fos/openapi/documentation/usingConduit/example1/simpleGraph/pipeline.xml
-## Found more than one match for simpleGraph/pipeline.xml /home/ahin017/files.fos/openapi/documentation/usingConduit/simpleGraph/pipeline.xml</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">savePipeline</span>(<span class="dt">pipeline =</span> simpleGraph, <span class="dt">targetDirectory =</span> <span class="st">&quot;savePipeline&quot;</span>)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">loadPipeline</span>(<span class="st">&quot;simpleGraph&quot;</span>,
+                 <span class="kw">normalizePath</span>(<span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>)))
+<span class="kw">savePipeline</span>(<span class="dt">pipeline =</span> simpleGraph, <span class="dt">targetDirectory =</span> <span class="st">&quot;savePipeline&quot;</span>)</code></pre>
 <pre><code>## [1] &quot;savePipeline/pipeline.xml&quot;</code></pre>
 <p>The resulting XML file can be found at:</p>
 <ul>
@@ -423,22 +430,21 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 <p><code>exportPipeline()</code> will save a pipeline to XML file, and save all its components to XML files, also. All the pipelines components will be given as references to the XML files created.</p>
 <p>This function will save the XML files to a directory with pipeline's name, in the location specified in the argument <code>targetDirectory</code>.</p>
 <p>Example:</p>
-<pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span><span class="kw">loadPipeline</span>(<span class="st">&quot;graphExport&quot;</span>,
-                            <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>))</code></pre>
-<pre><code>## Warning in findFile(ref, path, location): Found more than one match for simpleGraph/pipeline.xml /home/ahin017/files.fos/openapi/documentation/usingConduit/example1/simpleGraph/pipeline.xml
-## Found more than one match for simpleGraph/pipeline.xml /home/ahin017/files.fos/openapi/documentation/usingConduit/simpleGraph/pipeline.xml</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">exportPipeline</span>(<span class="dt">pipeline =</span> simpleGraph, <span class="dt">targetDirectory =</span> <span class="st">&quot;exportPipeline&quot;</span>)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">loadPipeline</span>(<span class="st">&quot;graphExport&quot;</span>,
+                 <span class="kw">normalizePath</span>(<span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>)))
+<span class="kw">exportPipeline</span>(<span class="dt">pipeline =</span> simpleGraph, <span class="dt">targetDirectory =</span> <span class="st">&quot;exportPipeline&quot;</span>)</code></pre>
 <pre><code>## $pipeline
 ## [1] &quot;exportPipeline/graphExport/pipeline.xml&quot;
+## 
+## $plotGraph
+## [1] &quot;exportPipeline/graphExport/plotGraph.xml&quot;
 ## 
 ## $createGraph
 ## [1] &quot;exportPipeline/graphExport/createGraph.xml&quot;
 ## 
 ## $layoutGraph
-## [1] &quot;exportPipeline/graphExport/layoutGraph.xml&quot;
-## 
-## $plotGraph
-## [1] &quot;exportPipeline/graphExport/plotGraph.xml&quot;</code></pre>
+## [1] &quot;exportPipeline/graphExport/layoutGraph.xml&quot;</code></pre>
 <p>The resulting XML files can be found at:</p>
 <ul>
 <li><a href="exportPipeline/graphExport/pipeline.xml">pipeline.xml</a></li>
@@ -493,106 +499,118 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 ## dev.off()</code></pre>
 <p>R users will notice that the first script calls for files <code>rentalListings.csv</code> and <code>suburbIDs.csv</code> but that no such objects have been created. These object will be named as an inputs for this module, and will be made available to the module's R script by the glue system. Similarly the data frame <code>rentalListings</code> will be named as an input for the second module.</p>
 <h3 id="getting-data-into-conduit-rentallistings-and-suburbids">Getting data into conduit: <code>rentalListings</code> and <code>suburbIDs</code></h3>
-<p>This module needs to read data from two CSV files, <a href="https://gist.github.com/anhinton/d174df68c7a050201841/raw/6370e0e970f4d59fe788ec12748f6232b278f85c/rentalListings.csv">rentalListings.csv</a> and <a href="https://gist.github.com/anhinton/d174df68c7a050201841/raw/11b510fca1c27cc965fb9c68bc391ae04d868a6e/suburbIDs.csv">suburbIDs.csv</a>. For each CSV file we will create a dummy module which provides the file as an external output.</p>
-<p>The <code>rentalListings</code> module will have one output, our pre-existing CSV:</p>
+<p>This module needs to read data from two CSV files, <a href="aucklandRents/data/rentalListings.csv">rentalListings.csv</a> and <a href="aucklandRents/data/suburbIDs.csv">suburbIDs.csv</a>. For each CSV file we will create a dummy module which provides the file as an external output.</p>
+<p>The <code>rentalListings</code> module will have one output, our first CSV file. External outputs for dummy modules require an absolute file path for <code>ref</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">rentalListingsOutput &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">moduleOutput</span>(<span class="dt">name =</span> <span class="st">&quot;rentalListings.csv&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;external&quot;</span>,
                  <span class="dt">format =</span> <span class="st">&quot;CSV file&quot;</span>,
-                 <span class="dt">ref =</span> <span class="st">&quot;https://gist.github.com/anhinton/d174df68c7a050201841/raw/6370e0e970f4d59fe788ec12748f6232b278f85c/rentalListings.csv&quot;</span>)</code></pre>
-<p>We will create the <code>rentalListings</code> module as follows:</p>
+                 <span class="dt">ref =</span> <span class="kw">normalizePath</span>(<span class="kw">file.path</span>(<span class="st">&quot;aucklandRents&quot;</span>, <span class="st">&quot;data&quot;</span>,
+                                               <span class="st">&quot;rentalListings.csv&quot;</span>)))</code></pre>
+<p>We then create the <code>rentalListings</code> module as follows:</p>
 <pre class="sourceCode r"><code class="sourceCode r">rentalListings &lt;-
 <span class="st">    </span><span class="kw">module</span>(<span class="dt">name =</span> <span class="st">&quot;rentalListings&quot;</span>, <span class="dt">platform =</span> <span class="st">&quot;R&quot;</span>,
            <span class="dt">description =</span> <span class="st">&quot;load rentalListings.csv into session&quot;</span>,
            <span class="dt">outputs =</span> <span class="kw">list</span>(rentalListingsOutput))</code></pre>
-<p>The `suburbIDs module is created similarly:</p>
+<p>The <code>suburbIDs</code> module is created similarly:</p>
 <pre class="sourceCode r"><code class="sourceCode r">suburbIDs &lt;-
 <span class="st">    </span><span class="kw">module</span>(<span class="st">&quot;suburbIDs&quot;</span>, <span class="st">&quot;R&quot;</span>, <span class="st">&quot;load suburbIDs.csv into session&quot;</span>,
            <span class="dt">outputs =</span> <span class="kw">list</span>(
                <span class="kw">moduleOutput</span>(<span class="st">&quot;suburbIDs.csv&quot;</span>, <span class="st">&quot;external&quot;</span>, <span class="st">&quot;CSV file&quot;</span>,
-                            <span class="dt">ref =</span> <span class="st">&quot;https://gist.github.com/anhinton/d174df68c7a050201841/raw/11b510fca1c27cc965fb9c68bc391ae04d868a6e/suburbIDs.csv&quot;</span>)))</code></pre>
+                            <span class="dt">ref =</span> <span class="kw">normalizePath</span>(
+                                <span class="kw">file.path</span>(<span class="st">&quot;aucklandRents&quot;</span>, <span class="st">&quot;data&quot;</span>,
+                                          <span class="st">&quot;suburbIDs.csv&quot;</span>)))))</code></pre>
 <h3 id="feeding-inputs-to-a-module-namesuburbs">Feeding inputs to a module: <code>nameSuburbs</code></h3>
 <p>As mentioned above, our next module requires two CSV files &quot;suburbIDs.csv&quot; and &quot;rentalListings.csv&quot;. We will create two external inputs with these name which <code>conduit</code> will use to provide the module with its required inputs:</p>
-<pre class="sourceCode r"><code class="sourceCode r">nameInput1 &lt;-<span class="st"> </span><span class="kw">moduleInput</span>(<span class="dt">name =</span> <span class="st">&quot;renatlListings.csv&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;external&quot;</span>, 
-                          <span class="dt">format =</span> <span class="st">&quot;CSV file&quot;</span>)
-nameInput2 &lt;-<span class="st"> </span><span class="kw">moduleInput</span>(<span class="st">&quot;suburbIDs.csv&quot;</span>, <span class="st">&quot;external&quot;</span>, <span class="st">&quot;CSV file&quot;</span>)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">nameSuburbsInputs &lt;-<span class="st"> </span><span class="kw">list</span>(
+    <span class="kw">moduleInput</span>(<span class="dt">name =</span> <span class="st">&quot;rentalListings.csv&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;external&quot;</span>, 
+                <span class="dt">format =</span> <span class="st">&quot;CSV file&quot;</span>),
+    <span class="kw">moduleInput</span>(<span class="st">&quot;suburbIDs.csv&quot;</span>, <span class="st">&quot;external&quot;</span>, <span class="st">&quot;CSV file&quot;</span>))</code></pre>
 <p>This module also has one source script, from the file <a href="aucklandRent/src/nameSuburbs.R">nameSuburbs.R</a>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">nameSuburbsSource &lt;-<span class="st"> </span><span class="kw">moduleSource</span>(<span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;aucklandRents&quot;</span>, <span class="st">&quot;src&quot;</span>,
                                                   <span class="st">&quot;nameSuburbs.R&quot;</span>))</code></pre>
-<p><span class="ann">TODO: UP TO HERE</span></p>
-<pre><code>nameSuburbs &lt;-
-    module(name = &quot;nameSuburbs&quot;, platform = &quot;R&quot;,
-           description = &quot;name suburbs in rentalListings.csv using key in suburbIDs.csv&quot;,
-           inputs = list(
-               moduleInput(&quot;rentalListings.csv&quot;, &quot;external&quot;, &quot;CSV file&quot;),
-               moduleInput(&quot;suburbIDs.csv&quot;, &quot;external&quot;, &quot;CSV file&quot;)),
-           sources = list(
-               moduleSource(ref = file.path(scripts, &quot;src/nameSuburbs.R&quot;))),
-           outputs=list(
-               moduleOutput(&quot;rentalListings&quot;, &quot;internal&quot;, &quot;R data frame&quot;)))</code></pre>
-<p>The source script creates an 'R &quot;graphNEL&quot; object, <code>directedGraph</code>, which we will name as an internal output:</p>
-<pre class="sourceCode r"><code class="sourceCode r">createGraphOutput &lt;-<span class="st"> </span><span class="kw">moduleOutput</span>(<span class="dt">name =</span> <span class="st">&quot;directedGraph&quot;</span>,
-                                  <span class="dt">type =</span> <span class="st">&quot;internal&quot;</span>,
-                                  <span class="dt">format =</span> <span class="st">&quot;R </span><span class="ch">\&quot;</span><span class="st">graphNEL</span><span class="ch">\&quot;</span><span class="st"> object&quot;</span>)</code></pre>
-<p>Now we can create a module object, <code>createGraph</code>, with the name, &quot;createGraph&quot;, a description, and the source and output created above:</p>
-<pre class="sourceCode r"><code class="sourceCode r">createGraph &lt;-<span class="st"> </span>
-<span class="st">    </span><span class="kw">module</span>(<span class="dt">name =</span> <span class="st">&quot;createGraph&quot;</span>,
-           <span class="dt">platform =</span> <span class="st">&quot;R&quot;</span>,
-           <span class="dt">description =</span> <span class="st">&quot;Create a simple directed graphNEL graph object with four nodes and four edges&quot;</span>,
-           <span class="dt">sources =</span> 
-               <span class="kw">list</span>(createGraphSource),
-           <span class="dt">outputs =</span> 
-               <span class="kw">list</span>(createGraphOutput))</code></pre>
-<h3 id="the-second-module-layoutgraph">The second module: <code>layoutGraph</code></h3>
-<p>As mentioned above, our second module script requires a &quot;graphNEL&quot; object, <code>myGraph</code>. We will create our module with an internal input called <code>myGraph</code> which <em>conduit</em> will use to provide this module with its required object:</p>
-<pre class="sourceCode r"><code class="sourceCode r">layoutGraphInput &lt;-<span class="st"> </span><span class="kw">moduleInput</span>(<span class="dt">name =</span> <span class="st">&quot;myGraph&quot;</span>,
-                                <span class="dt">type =</span> <span class="st">&quot;internal&quot;</span>,
-                                <span class="dt">format =</span> <span class="st">&quot;R </span><span class="ch">\&quot;</span><span class="st">graphNEL</span><span class="ch">\&quot;</span><span class="st"> object&quot;</span>)</code></pre>
-<p>This module has one source, from the file <a href="example1/scripts/layoutGraph.R">layoutGraph.R</a>, which produces an &quot;Ragraph&quot; object, <code>Ragraph</code>. We will name <code>Ragraph</code> as an output. We create the module with the following code:</p>
-<pre class="sourceCode r"><code class="sourceCode r">layoutGraph &lt;-
-<span class="st">    </span><span class="kw">module</span>(<span class="dt">name =</span> <span class="st">&quot;layoutGraph&quot;</span>,
-           <span class="dt">platform =</span> <span class="st">&quot;R&quot;</span>,
-           <span class="dt">description =</span> <span class="st">&quot;Lays out a graphNEL graph using the Rgraphviz package&quot;</span>,
-           <span class="dt">inputs =</span> <span class="kw">list</span>(layoutGraphInput),
-           <span class="dt">sources =</span> <span class="kw">list</span>(<span class="kw">moduleSource</span>(<span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;example1&quot;</span>, <span class="st">&quot;scripts&quot;</span>,
-                                                       <span class="st">&quot;layoutGraph.R&quot;</span>))),
-           <span class="dt">outputs =</span> <span class="kw">list</span>(<span class="kw">moduleOutput</span>(<span class="dt">name =</span> <span class="st">&quot;Ragraph&quot;</span>,
-                                       <span class="dt">type =</span> <span class="st">&quot;internal&quot;</span>,
-                                       <span class="dt">format =</span> <span class="st">&quot;R </span><span class="ch">\&quot;</span><span class="st">Ragraph</span><span class="ch">\&quot;</span><span class="st"> object&quot;</span>)))</code></pre>
-<h3 id="the-last-module-plotgraph">The last module: <code>plotGraph</code></h3>
-<p>The final script creates a PNG file, named &quot;example.png&quot;, in the current working directory. We will create an external output for this module, called &quot;example.png&quot;, and record the filename as the output's <code>ref</code>:</p>
-<pre class="sourceCode r"><code class="sourceCode r">plotGraphOutput &lt;-<span class="st"> </span><span class="kw">moduleOutput</span>(<span class="dt">name =</span> <span class="st">&quot;example.png&quot;</span>,
-                                <span class="dt">type =</span> <span class="st">&quot;external&quot;</span>,
-                                <span class="dt">ref =</span> <span class="st">&quot;example.png&quot;</span>,
-                                <span class="dt">format =</span> <span class="st">&quot;PNG image file&quot;</span>)</code></pre>
-<p>This module has one source script, from the file <a href="example1/scripts/plotGraph.R">plotGraph.R</a>. This script requires an &quot;Ragraph&quot; object, <code>Ragraph</code>. We create the module <code>plotGraph</code> with the following code:</p>
-<pre class="sourceCode r"><code class="sourceCode r">plotGraph &lt;-<span class="st"> </span>
-<span class="st">    </span><span class="kw">module</span>(<span class="dt">name =</span> <span class="st">&quot;plotGraph&quot;</span>,
-           <span class="dt">platform =</span> <span class="st">&quot;R&quot;</span>,
-           <span class="dt">description =</span> <span class="st">&quot;Plots an Ragraph object to a PNG file using the gridGraphviz package&quot;</span>,
-           <span class="dt">inputs =</span> <span class="kw">list</span>(<span class="kw">moduleInput</span>(<span class="dt">name =</span> <span class="st">&quot;Ragraph&quot;</span>,
-                                     <span class="dt">type =</span> <span class="st">&quot;internal&quot;</span>,
-                                     <span class="dt">format =</span> <span class="st">&quot;R </span><span class="ch">\&quot;</span><span class="st">Ragraph</span><span class="ch">\&quot;</span><span class="st"> object&quot;</span>)),
-           <span class="dt">sources =</span> <span class="kw">list</span>(<span class="kw">moduleSource</span>(<span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;example1&quot;</span>, <span class="st">&quot;scripts&quot;</span>,
-                                                       <span class="st">&quot;plotGraph.R&quot;</span>))),
-           <span class="dt">outputs =</span> <span class="kw">list</span>(plotGraphOutput))</code></pre>
+<p>The source script creates an 'R data frame' object, <code>rentalListings</code>, which we will name as an internal output:</p>
+<pre class="sourceCode r"><code class="sourceCode r">nameSuburbsOutput &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">moduleOutput</span>(<span class="st">&quot;rentalListings&quot;</span>, <span class="st">&quot;internal&quot;</span>, <span class="st">&quot;R data frame&quot;</span>)</code></pre>
+<p>Now we can create a module object, <code>nameSuburbs</code>, with the name &quot;nameSuburbs&quot;, a description, and the inputs, source and output created above:</p>
+<pre class="sourceCode r"><code class="sourceCode r">nameSuburbs &lt;-
+<span class="st">    </span><span class="kw">module</span>(<span class="dt">name =</span> <span class="st">&quot;nameSuburbs&quot;</span>, <span class="dt">platform =</span> <span class="st">&quot;R&quot;</span>,
+           <span class="dt">description =</span> <span class="st">&quot;name suburbs in rentalListings.csv using key in suburbIDs.csv&quot;</span>,
+           <span class="dt">inputs =</span> nameSuburbsInputs,
+           <span class="dt">sources =</span> <span class="kw">list</span>(nameSuburbsSource),
+           <span class="dt">outputs =</span> <span class="kw">list</span>(nameSuburbsOutput))</code></pre>
+<h3 id="the-choosesuburbs-module">The <code>chooseSuburbs</code> module</h3>
+<p>This module has one input, an 'R data frame' <code>rentalListings</code>, and one source from the file <a href="aucklandRents/src/chooseSuburbs.R">chooseSuburbs.R</a>. This source replaces the <code>rentalListings</code> object with a smaller data frame of rental listing from three specific suburbs. We will name <code>rentalListings</code> as an internal output:</p>
+<pre class="sourceCode r"><code class="sourceCode r">chooseSuburbs &lt;-
+<span class="st">    </span><span class="kw">module</span>(<span class="dt">name =</span> <span class="st">&quot;chooseSuburbs&quot;</span>, <span class="dt">platform =</span> <span class="st">&quot;R&quot;</span>,
+           <span class="dt">description =</span> <span class="st">&quot;produces a data frame of rent prices for the named suburbs&quot;</span>,
+           <span class="dt">inputs =</span> <span class="kw">list</span>(
+               <span class="kw">moduleInput</span>(<span class="st">&quot;rentalListings&quot;</span>, <span class="st">&quot;internal&quot;</span>, <span class="st">&quot;R data frame&quot;</span>)),
+           <span class="dt">sources =</span> <span class="kw">list</span>(
+               <span class="kw">moduleSource</span>(<span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;aucklandRents&quot;</span>, <span class="st">&quot;src&quot;</span>, 
+                                            <span class="st">&quot;chooseSuburbs.R&quot;</span>))),
+           <span class="dt">outputs =</span> <span class="kw">list</span>(
+               <span class="kw">moduleOutput</span>(<span class="st">&quot;rentalListings&quot;</span>, <span class="st">&quot;internal&quot;</span>, <span class="st">&quot;R data frame&quot;</span>)))</code></pre>
+<h3 id="the-last-module-boxplotbysuburb">The last module: <code>boxplotBySuburb</code></h3>
+<p>The final script creates an SVG file, named &quot;boxplot-rentBySuburb.svg&quot;, in the current working directory. We will create an external output for this module, named &quot;boxplot-rentBySuburb.svg&quot;, and record the filename as the output's <code>ref</code>:</p>
+<pre class="sourceCode r"><code class="sourceCode r">boxplotBySuburbOutput &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">moduleOutput</span>(<span class="dt">name =</span> <span class="st">&quot;boxplot-rentBySuburb.svg&quot;</span>,
+                 <span class="dt">type =</span> <span class="st">&quot;external&quot;</span>,
+                 <span class="dt">ref =</span> <span class="st">&quot;boxplot-rentBySuburb.svg&quot;</span>,
+                 <span class="dt">format =</span> <span class="st">&quot;SVG image file&quot;</span>)</code></pre>
+<p>This module has one source script, from the file <a href="aucklandRents/src/boxplotBySuburb.R">boxplotBySuburb.R</a>. This script requires an &quot;R data frame&quot; object, <code>rentalListings</code>. We create the module <code>plotGraph</code> with the following code:</p>
+<pre class="sourceCode r"><code class="sourceCode r">boxplotBySuburb &lt;-
+<span class="st">    </span><span class="kw">module</span>(<span class="st">&quot;boxplotBySuburb&quot;</span>, <span class="dt">platform=</span><span class="st">&quot;R&quot;</span>,
+           <span class="dt">inputs=</span><span class="kw">list</span>(
+               <span class="kw">moduleInput</span>(<span class="st">&quot;rentalListings&quot;</span>, <span class="st">&quot;internal&quot;</span>, <span class="st">&quot;R data frame&quot;</span>)),
+           <span class="dt">sources=</span><span class="kw">list</span>(
+               <span class="kw">moduleSource</span>(
+                   <span class="dt">ref=</span><span class="kw">file.path</span>(<span class="st">&quot;aucklandRents&quot;</span>, <span class="st">&quot;src&quot;</span>, 
+                                 <span class="st">&quot;boxplotBySuburb.R&quot;</span>))),
+           <span class="dt">outputs=</span><span class="kw">list</span>(boxplotBySuburbOutput))</code></pre>
 <h3 id="creating-pipes">Creating <code>pipe</code>s</h3>
 <p>A pipeline consists of a set of components, and a set of pipes describing how component outputs are connected to other component inputs. The modules created above are our components; we will now create our pipes.</p>
-<p>The <code>createGraph</code> module has an internal output, &quot;directedGraph&quot;, a 'graphNEL' object. We would like our pipeline to pass this output to the <code>layoutGraph</code> module, which requires a 'graphNEL' object called &quot;myGraph&quot; as an internal input. The following code will create this pipe:</p>
-<pre class="sourceCode r"><code class="sourceCode r">pipe1 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="dt">startComponent =</span> <span class="st">&quot;createGraph&quot;</span>, <span class="dt">startOutput =</span> <span class="st">&quot;directedGraph&quot;</span>,
-              <span class="dt">endComponent =</span> <span class="st">&quot;layoutGraph&quot;</span>, <span class="dt">endInput =</span> <span class="st">&quot;myGraph&quot;</span>)</code></pre>
-<p>We also need a pipe connecting the internal output &quot;Ragraph&quot; in <code>layoutGraph</code> to the internal input &quot;Ragraph&quot; in <code>plotGraph</code>. This is done with the following code:</p>
-<pre class="sourceCode r"><code class="sourceCode r">pipe2 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="dt">startComponent =</span> <span class="st">&quot;layoutGraph&quot;</span>, <span class="dt">startOutput =</span> <span class="st">&quot;Ragraph&quot;</span>,
-              <span class="dt">endComponent =</span> <span class="st">&quot;plotGraph&quot;</span>, <span class="dt">endInput =</span> <span class="st">&quot;Ragraph&quot;</span>)</code></pre>
-<h3 id="creating-the-simplegraph-pipeline">Creating the <code>simpleGraph</code> pipeline</h3>
-<p>We now have all the necessary pieces to create our <code>simpleGraph</code> pipeline. We have our list of components:</p>
-<pre class="sourceCode r"><code class="sourceCode r">componentsList &lt;-<span class="st"> </span><span class="kw">list</span>(createGraph, layoutGraph, plotGraph)</code></pre>
+<p>The dummy module <code>rentalListings</code> has an external output &quot;rentalListings.csv&quot;, a &quot;CSV file&quot;. We would like our pipeline to pas this output to the <code>nameSuburbs</code> module, which requires the &quot;CSV file&quot; external input &quot;rentalListings.csv&quot;`. The following code generates a pipe which makes this connection:</p>
+<pre class="sourceCode r"><code class="sourceCode r">pipe1 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="st">&quot;rentalListings&quot;</span>, <span class="st">&quot;rentalListings.csv&quot;</span>,
+              <span class="st">&quot;nameSuburbs&quot;</span>, <span class="st">&quot;rentalListings.csv&quot;</span>)</code></pre>
+<p>Similarly, we need a pipe connecting &quot;suburbIDs.csv&quot; from <code>suburbIDs</code> to &quot;suburbIDs.csv&quot; in <code>nameSuburbs</code>:</p>
+<pre class="sourceCode r"><code class="sourceCode r">pipe2 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="st">&quot;suburbIDs&quot;</span>, <span class="st">&quot;suburbIDs.csv&quot;</span>,
+              <span class="st">&quot;nameSuburbs&quot;</span>, <span class="st">&quot;suburbIDs.csv&quot;</span>)</code></pre>
+<p>Two more pipes are required, connecting &quot;rentalListings&quot; from <code>nameSuburbs</code> to &quot;rentalListings&quot; in <code>chooseSuburbs</code>, connection &quot;rentalListings&quot; from <code>chooseSuburbs</code> to &quot;rentalListings&quot; in <code>boxplotBySuburbs</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">pipe3 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="st">&quot;nameSuburbs&quot;</span>, <span class="st">&quot;rentalListings&quot;</span>,
+              <span class="st">&quot;chooseSuburbs&quot;</span>, <span class="st">&quot;rentalListings&quot;</span>)
+pipe4 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="st">&quot;chooseSuburbs&quot;</span>, <span class="st">&quot;rentalListings&quot;</span>,
+              <span class="st">&quot;boxplotBySuburb&quot;</span>, <span class="st">&quot;rentalListings&quot;</span>)</code></pre>
+<h3 id="creating-the-aucklandrents-pipeline">Creating the <code>aucklandRents</code> pipeline</h3>
+<p>We now have all the necessary pieces to create our <code>aucklandRents</code> pipeline. We have our list of components:</p>
+<pre class="sourceCode r"><code class="sourceCode r">componentsList &lt;-<span class="st"> </span><span class="kw">list</span>(rentalListings, suburbIDs, nameSuburbs,
+                       chooseSuburbs, boxplotBySuburb)</code></pre>
 <p>and our list of pipes:</p>
-<pre class="sourceCode r"><code class="sourceCode r">pipesList &lt;-<span class="st"> </span><span class="kw">list</span>(pipe1, pipe2)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">pipesList &lt;-<span class="st"> </span><span class="kw">list</span>(pipe1, pipe2, pipe3, pipe4)</code></pre>
 <p>The following code creates our pipeline object:</p>
-<pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span><span class="kw">pipeline</span>(<span class="dt">name =</span> <span class="st">&quot;simpleGraph&quot;</span>,
-                        <span class="dt">description =</span> <span class="st">&quot;This pipeline creates a directed graphNEL graph, lays it out using the Rgraphviz package, and then plots the graph as a PNG file using the gridGraphviz package&quot;</span>,
-                        <span class="dt">components =</span> componentsList,
-                        <span class="dt">pipes =</span> pipesList)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">aucklandRents &lt;-<span class="st"> </span><span class="kw">pipeline</span>(<span class="dt">name =</span> <span class="st">&quot;aucklandRents&quot;</span>,
+                          <span class="dt">description =</span> <span class="st">&quot;&quot;</span>,
+                          <span class="dt">components =</span> componentsList,
+                          <span class="dt">pipes =</span> pipesList)</code></pre>
+<h3 id="running-the-aucklandrents-pipeline">Running the <code>aucklandRents</code> pipeline</h3>
+<p>Now we can run our pipeline:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runPipeline</span>(aucklandRents)</code></pre>
+<p>This creates the following files:</p>
+<ol style="list-style-type: decimal">
+<li><a href="pipelines/aucklandRents/modules/boxplotBySuburb/boxplot-rentBySuburb.svg" class="uri">pipelines/aucklandRents/modules/boxplotBySuburb/boxplot-rentBySuburb.svg</a></li>
+<li><a href="pipelines/aucklandRents/modules/boxplotBySuburb/script.R" class="uri">pipelines/aucklandRents/modules/boxplotBySuburb/script.R</a></li>
+<li><a href="pipelines/aucklandRents/modules/chooseSuburbs/rentalListings.rds" class="uri">pipelines/aucklandRents/modules/chooseSuburbs/rentalListings.rds</a></li>
+<li><a href="pipelines/aucklandRents/modules/chooseSuburbs/script.R" class="uri">pipelines/aucklandRents/modules/chooseSuburbs/script.R</a></li>
+<li><a href="pipelines/aucklandRents/modules/nameSuburbs/rentalListings.rds" class="uri">pipelines/aucklandRents/modules/nameSuburbs/rentalListings.rds</a></li>
+<li><a href="pipelines/aucklandRents/modules/nameSuburbs/script.R" class="uri">pipelines/aucklandRents/modules/nameSuburbs/script.R</a></li>
+<li><a href="pipelines/aucklandRents/modules/rentalListings/script.R" class="uri">pipelines/aucklandRents/modules/rentalListings/script.R</a></li>
+<li><a href="pipelines/aucklandRents/modules/suburbIDs/script.R" class="uri">pipelines/aucklandRents/modules/suburbIDs/script.R</a></li>
+</ol>
+<p>File number 1, <a href="pipelines/aucklandRents/modules/boxplotBySuburb/boxplot-rentBySuburb.svg" class="uri">pipelines/aucklandRents/modules/boxplotBySuburb/boxplot-rentBySuburb.svg</a>, is the output file we require, the SVG image of the plot. The image is shown below:</p>
+<div class="figure">
+<img src="pipelines/aucklandRents/modules/boxplotBySuburb/boxplot-rentBySuburb.svg" alt="Pipeline output: aucklandRents plot" />
+<p class="caption">Pipeline output: <code>aucklandRents</code> plot</p>
+</div>
+<p><span class="ann">TODO: 2015-02-17: UP TO HERE</span></p>
 <h3 id="exporting-the-simplegraph-pipeline-to-xml">Exporting the <code>simpleGraph</code> pipeline to XML</h3>
 <p>Our final step is to export the <code>simpleGraph</code> pipeline and its components to XML files so we can share them. The following code will create a directory with the same name as our pipeline, &quot;simpleGraph&quot;, and create XML files for the pipeline and each of its components in this directory. This is done with the following code:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">exportPipeline</span>(<span class="dt">pipeline =</span> simpleGraph,

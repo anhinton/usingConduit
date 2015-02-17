@@ -8,14 +8,15 @@ rentalListings <-
            outputs = list(
                moduleOutput(name = "rentalListings.csv", type = "external",
                             format = "CSV file",
-                            ref = file.path(scripts, "data/rentalListings.csv"))))
+                            ref = normalizePath(file.path(scripts, "data/rentalListings.csv")))))
 
 ## MODULE: suburbIDs
 suburbIDs <-
     module("suburbIDs", "R", "load suburbIDs.csv into session",
            outputs = list(
                moduleOutput("suburbIDs.csv", "external", "CSV file",
-                            ref = file.path(scripts, "data/suburbIDs.csv"))))
+                            ref = normalizePath(
+                                file.path(scripts, "data", "suburbIDs.csv")))))
 
 ## PIPE: pipe1
 pipe1 <- pipe("rentalListings", "rentalListings.csv",
