@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<pipeline xmlns="http://www.openapi.org/2014/">
+  <description></description>
+  <component name="rentalListings" ref="rentalListings.xml" type="module"/>
+  <component name="suburbIDs" ref="suburbIDs.xml" type="module"/>
+  <component name="nameSuburbs" ref="nameSuburbs.xml" type="module"/>
+  <component name="chooseSuburbs" ref="chooseSuburbs.xml" type="module"/>
+  <component name="boxplotBySuburb" ref="boxplotBySuburb.xml" type="module"/>
+  <pipe>
+    <start component="rentalListings" output="rentalListings.csv"/>
+    <end component="nameSuburbs" input="rentalListings.csv"/>
+  </pipe>
+  <pipe>
+    <start component="suburbIDs" output="suburbIDs.csv"/>
+    <end component="nameSuburbs" input="suburbIDs.csv"/>
+  </pipe>
+  <pipe>
+    <start component="nameSuburbs" output="rentalListings"/>
+    <end component="chooseSuburbs" input="rentalListings"/>
+  </pipe>
+  <pipe>
+    <start component="chooseSuburbs" output="rentalListings"/>
+    <end component="boxplotBySuburb" input="rentalListings"/>
+  </pipe>
+</pipeline>

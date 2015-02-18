@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<module xmlns="http://www.openapi.org/2014/">
+  <description>produces a data frame of rent prices for the named suburbs</description>
+  <platform name="R"/>
+  <input name="rentalListings" type="internal">
+    <format formatType="text">R data frame</format>
+  </input>
+  <source ref="aucklandRents/src/chooseSuburbs.R"/>
+  <output name="rentalListings" type="internal">
+    <format formatType="text">R data frame</format>
+  </output>
+</module>

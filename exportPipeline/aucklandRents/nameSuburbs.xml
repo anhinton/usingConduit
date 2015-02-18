@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<module xmlns="http://www.openapi.org/2014/">
+  <description>name suburbs in rentalListings.csv using key in suburbIDs.csv</description>
+  <platform name="R"/>
+  <input name="rentalListings.csv" type="external">
+    <format formatType="text">CSV file</format>
+  </input>
+  <input name="suburbIDs.csv" type="external">
+    <format formatType="text">CSV file</format>
+  </input>
+  <source ref="aucklandRents/src/nameSuburbs.R"/>
+  <output name="rentalListings" type="internal">
+    <format formatType="text">R data frame</format>
+  </output>
+</module>
