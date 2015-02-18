@@ -82,7 +82,7 @@ Department of Statistics, The University of Auckland
 <h2 id="quick-start-running-a-pipeline">Quick start: running a pipeline</h2>
 <h3 id="installing-conduit">Installing <em>conduit</em></h3>
 <p><em>conduit</em> is an R package built using R version 3.1.x on a 64-bit Linux machine. It requires the following R packages: <a href="http://www.omegahat.org/RSXML" title="XML: Tools for parsing and generating XML within R and S-Plus"><em>XML</em></a>, <a href="http://bioconductor.org/packages/release/bioc/html/graph.html" title="graph: A package to handle graph data structures"><em>graph</em></a>, <a href="http://bioconductor.org/packages/release/bioc/html/RBGL.html" title="RBGL: An interface to the BOOST graph library"><em>RBGL</em></a>, and <a href="http://www.omegahat.org/RCurl" title="RCurl: General network (HTTP/FTP/...) client interface for R"><em>RCurl</em></a>. The <a href="http://cran.r-project.org/web/packages/devtools/index.html" title="devtools: Tools to make developing R code easier"><em>devtools</em></a> is required to install <em>conduit</em> directly from github. The <a href="http://bioconductor.org/packages/release/bioc/html/Rgraphviz.html" title="Rgraphviz: Provides plotting capabilities for R graph objects"><em>Rgraphviz</em></a> and <a href="http://r-forge.r-project.org/R/?group_id=1272" title="gridGraphviz: Drawing Graphs with Grid"><em>gridGraphviz</em></a> packages are required to run the modules in this quick start example.</p>
-<p>Version 0.1 of the <em>conduit</em>, built 2015-02-08, is <a href="conduit_0.1-0.tar.gz">available for download</a>.</p>
+<p>Version 0.1-1 of the <em>conduit</em>, built 2015-02-08, is <a href="conduit_0.1-1.tar.gz">available for download</a>.</p>
 <p>Source code for <em>conduit</em> is available at <a href="https://github.com/anhinton/conduit" class="uri">https://github.com/anhinton/conduit</a> for those who would like to build and install the package manually.</p>
 <p>To install <em>conduit</em> using <em>devtools</em>:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;devtools&quot;</span>)
@@ -92,7 +92,6 @@ devtools::<span class="kw">install_github</span>(<span class="st">&quot;anhinton
 <h3 id="reading-a-pipeline-from-an-xml-file">Reading a pipeline from an XML file</h3>
 <p>The <code>loadPipeline()</code> function is used to read a pipeline XML file into <em>conduit</em>. <code>loadPipeline()</code> requires a <code>name</code> argument, and a <code>ref</code> argument which describes the XML file location The function returns a <code>pipeline</code> object.</p>
 <p>We will load a pipeline which creates and plots a simple node-and-edge graph. oThe pipeline XML file is in a sub-directory of the R working directory called 'simpleGraph'.</p>
-<p><span class="ann">TODO: better describe pipeline example</span></p>
 <pre class="sourceCode r"><code class="sourceCode r">## load the simpleGraph pipeline
 simpleGraph &lt;-<span class="st"> </span>
 <span class="st">    </span><span class="kw">loadPipeline</span>(<span class="dt">name =</span> <span class="st">&quot;simpleGraph&quot;</span>, 

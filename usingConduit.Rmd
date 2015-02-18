@@ -36,8 +36,8 @@ directly from github. The [*Rgraphviz*][Rgraphviz-package] and
 [*gridGraphviz*][gridGraphviz-package] packages are required to run
 the modules in this quick start example.
 
-Version 0.1 of the *conduit*, built 2015-02-08, is [available for
-download](conduit_0.1-0.tar.gz).
+Version 0.1-1 of the *conduit*, built 2015-02-08, is [available for
+download](conduit_0.1-1.tar.gz).
 
 Source code for *conduit* is available at
 <https://github.com/anhinton/conduit> for those who would like to
@@ -66,8 +66,6 @@ argument which describes the XML file location The function returns a
 We will load a pipeline which creates and plots a simple node-and-edge
 graph. oThe pipeline XML file is in a sub-directory of the R working
 directory called 'simpleGraph'.
-
-<span class="ann">TODO: better describe pipeline example</span>
 
 ```{r loadPipelineFalse}
 ## load the simpleGraph pipeline
