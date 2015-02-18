@@ -985,34 +985,44 @@ below:
 
 ![Pipeline output: `aucklandRents` plot](`r pipeline_files[exampleGraph]`)
 
-<span class="ann">TODO: 2015-02-17: UP TO HERE</span>
-
 ### Exporting the `simpleGraph` pipeline to XML
 
-Our final step is to export the `simpleGraph` pipeline and its
+Our final step is to export the `aucklandRents` pipeline and its
 components to XML files so we can share them. The following code will
-create a directory with the same name as our pipeline, "simpleGraph",
+create a directory with the same name as our pipeline, "aucklandRents",
 and create XML files for the pipeline and each of its components in
 this directory. This is done with the following code:
 
-```{r exportSimpleGraph, results='hide'}
-exportPipeline(pipeline = simpleGraph,
-               targetDirectory = file.path(getwd(), "example1"))
+```{r exportAucklandRents, results='hide'}
+exportPipeline(pipeline = aucklandRents,
+               targetDirectory = file.path(getwd(), "exportPipeline"))
 ```
 
 The resulting pipeline file,
-[example1/simpleGraph/pipeline.xml](example1/simpleGraph/pipeline.xml),
+[exportPipeline/aucklandRents/pipeline.xml](exportPipeline/aucklandRents/pipeline.xml),
 contains the following XML:
 
 ```{r exportExampleContent, echo=FALSE}
-cat(readLines("example1/simpleGraph/pipeline.xml"), sep="\n")
+cat(readLines("exportPipeline/aucklandRents/pipeline.xml"), sep="\n")
 ```
 
 The component XML files can be seen at:
 
-  + [example1/simpleGraph/createGraph.xml](example1/simpleGraph/createGraph.xml)
-  + [example1/simpleGraph/layoutGraph.xml](example1/simpleGraph/layoutGraph.xml)
-  + [example1/simpleGraph/plotGraph.xml](example1/simpleGraph/plotGraph.xml)
+```{r exportAucklandFiles, echo=FALSE, results = "asis"}
+all_files <- list.files(recursive = TRUE, all.files = TRUE)
+pipeline_files <- 
+    all_files[grepl("^exportPipeline/aucklandRents", all_files) & 
+              !grepl("pipeline.xml$", all_files)]
+pipeline_file_links <- paste0("  + [", 
+                         pipeline_files, "](", pipeline_files, ")")
+cat(pipeline_file_links, sep="\n")
+```
+
+Spotters will notice that the external output `ref`s in
+rentalListings.xml and suburbIDs.xml refer to absolute paths on the
+author's machine; to run this pipeline these will need to be edited to
+reflect local locations of these data files. A mechanism for exporting
+data sources has not yet been written into `conduit`.
 
 Example: combining R and python scripts
 ---------------------------------------

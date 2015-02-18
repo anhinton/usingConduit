@@ -276,14 +276,14 @@ myGraph &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span cl
 tempTarget &lt;-<span class="st"> </span><span class="kw">tempdir</span>()
 <span class="kw">saveModule</span>(<span class="dt">module =</span> createGraph, <span class="dt">targetDirectory =</span> tempTarget,
            <span class="dt">filename =</span> <span class="st">&quot;newCreateGraph.xml&quot;</span>)</code></pre>
-<pre><code>## [1] &quot;/tmp/Rtmp2TPVsz/newCreateGraph.xml&quot;</code></pre>
+<pre><code>## [1] &quot;/tmp/Rtmp0hSkgv/newCreateGraph.xml&quot;</code></pre>
 <p>Save a module to XML without specifiying the filename:</p>
 <pre class="sourceCode r"><code class="sourceCode r">layoutGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="st">&quot;layoutGraph&quot;</span>, 
                           <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;layoutGraph.xml&quot;</span>))
 layoutGraph$name</code></pre>
 <pre><code>## [1] &quot;layoutGraph&quot;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">saveModule</span>(<span class="dt">module =</span> layoutGraph, <span class="dt">targetDirectory =</span> tempTarget)</code></pre>
-<pre><code>## [1] &quot;/tmp/Rtmp2TPVsz/layoutGraph.xml&quot;</code></pre>
+<pre><code>## [1] &quot;/tmp/Rtmp0hSkgv/layoutGraph.xml&quot;</code></pre>
 <h2 id="pipelines">Pipelines</h2>
 <p>This sections describes how to: load pipelines from XML files; create pipelines ; execute pipeline components; save pipelines and their components as XML files.</p>
 <h3 id="loading-pipelines-from-xml">Loading pipelines from XML</h3>
@@ -610,33 +610,45 @@ pipe4 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="st
 <img src="pipelines/aucklandRents/modules/boxplotBySuburb/boxplot-rentBySuburb.svg" alt="Pipeline output: aucklandRents plot" />
 <p class="caption">Pipeline output: <code>aucklandRents</code> plot</p>
 </div>
-<p><span class="ann">TODO: 2015-02-17: UP TO HERE</span></p>
 <h3 id="exporting-the-simplegraph-pipeline-to-xml">Exporting the <code>simpleGraph</code> pipeline to XML</h3>
-<p>Our final step is to export the <code>simpleGraph</code> pipeline and its components to XML files so we can share them. The following code will create a directory with the same name as our pipeline, &quot;simpleGraph&quot;, and create XML files for the pipeline and each of its components in this directory. This is done with the following code:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">exportPipeline</span>(<span class="dt">pipeline =</span> simpleGraph,
-               <span class="dt">targetDirectory =</span> <span class="kw">file.path</span>(<span class="kw">getwd</span>(), <span class="st">&quot;example1&quot;</span>))</code></pre>
-<p>The resulting pipeline file, <a href="example1/simpleGraph/pipeline.xml" class="uri">example1/simpleGraph/pipeline.xml</a>, contains the following XML:</p>
+<p>Our final step is to export the <code>aucklandRents</code> pipeline and its components to XML files so we can share them. The following code will create a directory with the same name as our pipeline, &quot;aucklandRents&quot;, and create XML files for the pipeline and each of its components in this directory. This is done with the following code:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">exportPipeline</span>(<span class="dt">pipeline =</span> aucklandRents,
+               <span class="dt">targetDirectory =</span> <span class="kw">file.path</span>(<span class="kw">getwd</span>(), <span class="st">&quot;exportPipeline&quot;</span>))</code></pre>
+<p>The resulting pipeline file, <a href="exportPipeline/aucklandRents/pipeline.xml" class="uri">exportPipeline/aucklandRents/pipeline.xml</a>, contains the following XML:</p>
 <pre><code>## &lt;?xml version=&quot;1.0&quot;?&gt;
 ## &lt;pipeline xmlns=&quot;http://www.openapi.org/2014/&quot;&gt;
-##   &lt;description&gt;This pipeline creates a directed graphNEL graph, lays it out using the Rgraphviz package, and then plots the graph as a PNG file using the gridGraphviz package&lt;/description&gt;
-##   &lt;component name=&quot;createGraph&quot; ref=&quot;createGraph.xml&quot; type=&quot;module&quot;/&gt;
-##   &lt;component name=&quot;layoutGraph&quot; ref=&quot;layoutGraph.xml&quot; type=&quot;module&quot;/&gt;
-##   &lt;component name=&quot;plotGraph&quot; ref=&quot;plotGraph.xml&quot; type=&quot;module&quot;/&gt;
+##   &lt;description&gt;&lt;/description&gt;
+##   &lt;component name=&quot;rentalListings&quot; ref=&quot;rentalListings.xml&quot; type=&quot;module&quot;/&gt;
+##   &lt;component name=&quot;suburbIDs&quot; ref=&quot;suburbIDs.xml&quot; type=&quot;module&quot;/&gt;
+##   &lt;component name=&quot;nameSuburbs&quot; ref=&quot;nameSuburbs.xml&quot; type=&quot;module&quot;/&gt;
+##   &lt;component name=&quot;chooseSuburbs&quot; ref=&quot;chooseSuburbs.xml&quot; type=&quot;module&quot;/&gt;
+##   &lt;component name=&quot;boxplotBySuburb&quot; ref=&quot;boxplotBySuburb.xml&quot; type=&quot;module&quot;/&gt;
 ##   &lt;pipe&gt;
-##     &lt;start component=&quot;createGraph&quot; output=&quot;directedGraph&quot;/&gt;
-##     &lt;end component=&quot;layoutGraph&quot; input=&quot;myGraph&quot;/&gt;
+##     &lt;start component=&quot;rentalListings&quot; output=&quot;rentalListings.csv&quot;/&gt;
+##     &lt;end component=&quot;nameSuburbs&quot; input=&quot;rentalListings.csv&quot;/&gt;
 ##   &lt;/pipe&gt;
 ##   &lt;pipe&gt;
-##     &lt;start component=&quot;layoutGraph&quot; output=&quot;Ragraph&quot;/&gt;
-##     &lt;end component=&quot;plotGraph&quot; input=&quot;Ragraph&quot;/&gt;
+##     &lt;start component=&quot;suburbIDs&quot; output=&quot;suburbIDs.csv&quot;/&gt;
+##     &lt;end component=&quot;nameSuburbs&quot; input=&quot;suburbIDs.csv&quot;/&gt;
+##   &lt;/pipe&gt;
+##   &lt;pipe&gt;
+##     &lt;start component=&quot;nameSuburbs&quot; output=&quot;rentalListings&quot;/&gt;
+##     &lt;end component=&quot;chooseSuburbs&quot; input=&quot;rentalListings&quot;/&gt;
+##   &lt;/pipe&gt;
+##   &lt;pipe&gt;
+##     &lt;start component=&quot;chooseSuburbs&quot; output=&quot;rentalListings&quot;/&gt;
+##     &lt;end component=&quot;boxplotBySuburb&quot; input=&quot;rentalListings&quot;/&gt;
 ##   &lt;/pipe&gt;
 ## &lt;/pipeline&gt;</code></pre>
 <p>The component XML files can be seen at:</p>
 <ul>
-<li><a href="example1/simpleGraph/createGraph.xml" class="uri">example1/simpleGraph/createGraph.xml</a></li>
-<li><a href="example1/simpleGraph/layoutGraph.xml" class="uri">example1/simpleGraph/layoutGraph.xml</a></li>
-<li><a href="example1/simpleGraph/plotGraph.xml" class="uri">example1/simpleGraph/plotGraph.xml</a></li>
+<li><a href="exportPipeline/aucklandRents/boxplotBySuburb.xml" class="uri">exportPipeline/aucklandRents/boxplotBySuburb.xml</a></li>
+<li><a href="exportPipeline/aucklandRents/chooseSuburbs.xml" class="uri">exportPipeline/aucklandRents/chooseSuburbs.xml</a></li>
+<li><a href="exportPipeline/aucklandRents/nameSuburbs.xml" class="uri">exportPipeline/aucklandRents/nameSuburbs.xml</a></li>
+<li><a href="exportPipeline/aucklandRents/rentalListings.xml" class="uri">exportPipeline/aucklandRents/rentalListings.xml</a></li>
+<li><a href="exportPipeline/aucklandRents/suburbIDs.xml" class="uri">exportPipeline/aucklandRents/suburbIDs.xml</a></li>
 </ul>
+<p>Spotters will notice that the external output <code>ref</code>s in rentalListings.xml and suburbIDs.xml refer to absolute paths on the author's machine; to run this pipeline these will need to be edited to reflect local locations of these data files. A mechanism for exporting data sources has not yet been written into <code>conduit</code>.</p>
 <h2 id="example-combining-r-and-python-scripts">Example: combining R and python scripts</h2>
 <p><span class="ann">TODO: write an example combining R and python scripts</span></p>
 <hr />
