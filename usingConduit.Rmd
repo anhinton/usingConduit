@@ -1,5 +1,6 @@
 % Guide to using *conduit*
-% Ashley Noel Hinton
+% Ashley Noel Hinton <ahin017@aucklanduni.ac.nz>
+% Time-stamp: <2015-02-19 14:26:06 ahin017>
 
 ```{r setup, include=FALSE, cache=FALSE}
 knitr::opts_chunk$set(cache=TRUE)
