@@ -9,7 +9,7 @@
     <format formatType="text">CSV file</format>
   </input>
   <source ref="aucklandRents/src/nameSuburbs.R"/>
-  <output name="rentalListings" type="internal">
+  <output name="namedListings" type="internal">
     <format formatType="text">R data frame</format>
   </output>
 </module>

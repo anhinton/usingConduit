@@ -1,9 +1,6 @@
-inKingsland <- rentalListings$suburb == "Kingsland"
-inGreyLynn <- rentalListings$suburb == "Grey Lynn"
-inPonsonby <- rentalListings$suburb == "Ponsonby"
+ofInterest <-
+    namedListings$subNames %in% c("Kingsland", "Grey Lynn", "Ponsonby")
 
-ofInterest <- inKingsland | inGreyLynn | inPonsonby
-
-rentalListings <- rentalListings[ofInterest,]
-rentalListings$suburb <- factor(rentalListings$suburb)
+shortListings <- namedListings[ofInterest,]
+shortListings$subNames <- factor(shortListings$subNames)
 

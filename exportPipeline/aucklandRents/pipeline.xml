@@ -15,11 +15,11 @@
     <end component="nameSuburbs" input="suburbIDs.csv"/>
   </pipe>
   <pipe>
-    <start component="nameSuburbs" output="rentalListings"/>
-    <end component="chooseSuburbs" input="rentalListings"/>
+    <start component="nameSuburbs" output="namedListings"/>
+    <end component="chooseSuburbs" input="namedListings"/>
   </pipe>
   <pipe>
-    <start component="chooseSuburbs" output="rentalListings"/>
-    <end component="boxplotBySuburb" input="rentalListings"/>
+    <start component="chooseSuburbs" output="shortListings"/>
+    <end component="boxplotBySuburb" input="listings"/>
   </pipe>
 </pipeline>

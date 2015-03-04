@@ -1,4 +1,4 @@
 svg("boxplot-rentBySuburb.svg")
-boxplot(rentalListings$rent ~ rentalListings$suburb, xlab = "Suburb",
+boxplot(listings$rent ~ listings$subNames, xlab = "Suburb",
         ylab = "Rent per week ($)", main="Rental prices in Auckland")
 dev.off()

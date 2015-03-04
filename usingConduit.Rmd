@@ -1,6 +1,6 @@
 % Guide to using *conduit*
 % Ashley Noel Hinton <ahin017@aucklanduni.ac.nz>
-% Time-stamp: <2015-02-19 14:26:06 ahin017>
+% Time-stamp: <2015-03-04 16:54:13 ahin017>
 
 ```{r setup, include=FALSE, cache=FALSE}
 knitr::opts_chunk$set(cache=TRUE)
@@ -749,8 +749,9 @@ R users will notice that the first script calls for files
 `rentalListings.csv` and `suburbIDs.csv` but that no such objects have
 been created. These object will be named as an inputs for this module,
 and will be made available to the module's R script by the glue
-system. Similarly the data frame `rentalListings` will be named as an
-input for the second module.
+system. Similarly the data frame `namedListings` will be named as an
+input for the second module, and `listings` as an input for the last
+module.
 
 ### Getting data into conduit: `rentalListings` and `suburbIDs`
 
@@ -809,7 +810,7 @@ nameSuburbsInputs <- list(
 ```
 
 This module also has one source script, from the file
-[nameSuburbs.R](aucklandRent/src/nameSuburbs.R):
+[nameSuburbs.R](aucklandRents/src/nameSuburbs.R):
 
 ```{r nameSuburbSource}
 nameSuburbsSource <- moduleSource(ref = file.path("aucklandRents", "src",
@@ -817,12 +818,12 @@ nameSuburbsSource <- moduleSource(ref = file.path("aucklandRents", "src",
 
 ```
 
-The source script creates an 'R data frame' object, `rentalListings`,
+The source script creates an 'R data frame' object, `namedListings`,
 which we will name as an internal output:
 
 ```{r nameSuburbOutput}
 nameSuburbsOutput <- 
-    moduleOutput("rentalListings", "internal", "R data frame")
+    moduleOutput("namedListings", "internal", "R data frame")
 ```
 
 Now we can create a module object, `nameSuburbs`, with the name
@@ -840,24 +841,24 @@ nameSuburbs <-
 
 ### The `chooseSuburbs` module
 
-This module has one input, an 'R data frame' `rentalListings`, and one
+This module has one input, an 'R data frame' `namedListings`, and one
 source from the file
 [chooseSuburbs.R](aucklandRents/src/chooseSuburbs.R). This source
-replaces the `rentalListings` object with a smaller data frame of
-rental listing from three specific suburbs. We will name
-`rentalListings` as an internal output:
+produce an 'R data frame' `shortListings`, a smaller data frame of
+rental listings from three specific suburbs. We will name
+`shortListings` as an internal output:
 
 ```{r chooseSuburbsModule}
 chooseSuburbs <-
     module(name = "chooseSuburbs", platform = "R",
            description = "produces a data frame of rent prices for the named suburbs",
            inputs = list(
-               moduleInput("rentalListings", "internal", "R data frame")),
+               moduleInput("namedListings", "internal", "R data frame")),
            sources = list(
                moduleSource(ref = file.path("aucklandRents", "src", 
                                             "chooseSuburbs.R"))),
            outputs = list(
-               moduleOutput("rentalListings", "internal", "R data frame")))
+               moduleOutput("shortListings", "internal", "R data frame")))
 ```
 
 ### The last module: `boxplotBySuburb`
@@ -879,14 +880,14 @@ boxplotBySuburbOutput <-
 
 This module has one source script, from the file
 [boxplotBySuburb.R](aucklandRents/src/boxplotBySuburb.R). This script
-requires an "R data frame" object, `rentalListings`. We create the module
-`plotGraph` with the following code:
+requires an "R data frame" object, `listings`. We create the module
+`boxplotBySuburb` with the following code:
 
 ```{r boxplotBySuburbModule}
 boxplotBySuburb <-
     module("boxplotBySuburb", platform="R",
            inputs=list(
-               moduleInput("rentalListings", "internal", "R data frame")),
+               moduleInput("listings", "internal", "R data frame")),
            sources=list(
                moduleSource(
                    ref=file.path("aucklandRents", "src", 
@@ -919,16 +920,16 @@ pipe2 <- pipe("suburbIDs", "suburbIDs.csv",
               "nameSuburbs", "suburbIDs.csv")
 ```
 
-Two more pipes are required, connecting "rentalListings" from
-`nameSuburbs` to "rentalListings" in `chooseSuburbs`, connection
-"rentalListings" from `chooseSuburbs` to "rentalListings" in
+Two more pipes are required, connecting "namedListings" from
+`nameSuburbs` to "namedListings" in `chooseSuburbs`, and connecting
+"shortListings" from `chooseSuburbs` to "listings" in
 `boxplotBySuburbs`.
 
 ```{r createPipe3}
-pipe3 <- pipe("nameSuburbs", "rentalListings",
-              "chooseSuburbs", "rentalListings")
-pipe4 <- pipe("chooseSuburbs", "rentalListings",
-              "boxplotBySuburb", "rentalListings")
+pipe3 <- pipe("nameSuburbs", "namedListings",
+              "chooseSuburbs", "namedListings")
+pipe4 <- pipe("chooseSuburbs", "shortListings",
+              "boxplotBySuburb", "listings")
 ```
 
 

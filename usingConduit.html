@@ -41,7 +41,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 Ashley Noel Hinton <a href="mailto:ahin017@aucklanduni.ac.nz">ahin017@aucklanduni.ac.nz</a><br/>
 </p>
 
-<p class="date">Time-stamp: &lt;2015-02-19 14:26:06 ahin017&gt;</p>
+<p class="date">Time-stamp: &lt;2015-03-04 16:54:13 ahin017&gt;</p>
 </div>
 <div id="TOC">
 <ul>
@@ -275,14 +275,14 @@ myGraph &lt;-<span class="st"> </span><span class="kw">file.path</span>(<span cl
 tempTarget &lt;-<span class="st"> </span><span class="kw">tempdir</span>()
 <span class="kw">saveModule</span>(<span class="dt">module =</span> createGraph, <span class="dt">targetDirectory =</span> tempTarget,
            <span class="dt">filename =</span> <span class="st">&quot;newCreateGraph.xml&quot;</span>)</code></pre>
-<pre><code>## [1] &quot;/tmp/Rtmp0hSkgv/newCreateGraph.xml&quot;</code></pre>
+<pre><code>## [1] &quot;/tmp/RtmpnXBEa8/newCreateGraph.xml&quot;</code></pre>
 <p>Save a module to XML without specifiying the filename:</p>
 <pre class="sourceCode r"><code class="sourceCode r">layoutGraph &lt;-<span class="st"> </span><span class="kw">loadModule</span>(<span class="st">&quot;layoutGraph&quot;</span>, 
                           <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;layoutGraph.xml&quot;</span>))
 layoutGraph$name</code></pre>
 <pre><code>## [1] &quot;layoutGraph&quot;</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">saveModule</span>(<span class="dt">module =</span> layoutGraph, <span class="dt">targetDirectory =</span> tempTarget)</code></pre>
-<pre><code>## [1] &quot;/tmp/Rtmp0hSkgv/layoutGraph.xml&quot;</code></pre>
+<pre><code>## [1] &quot;/tmp/RtmpnXBEa8/layoutGraph.xml&quot;</code></pre>
 <h2 id="pipelines">Pipelines</h2>
 <p>This sections describes how to: load pipelines from XML files; create pipelines ; execute pipeline components; save pipelines and their components as XML files.</p>
 <h3 id="loading-pipelines-from-xml">Loading pipelines from XML</h3>
@@ -371,10 +371,8 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 <p>This function has one argument, <code>pipeline</code>, which must be a pipeline object created using <code>pipeline()</code> or <code>loadPipeline()</code>.</p>
 <p>Example:</p>
 <pre class="sourceCode r"><code class="sourceCode r">simpleGraph &lt;-<span class="st"> </span><span class="kw">loadPipeline</span>(<span class="st">&quot;simpleGraph&quot;</span>,
-                            <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>))</code></pre>
-<pre><code>## Warning in findFile(ref, path, location): Found more than one match for simpleGraph/pipeline.xml /home/ahin017/files.fos/openapi/documentation/usingConduit/example1/simpleGraph/pipeline.xml
-## Found more than one match for simpleGraph/pipeline.xml /home/ahin017/files.fos/openapi/documentation/usingConduit/simpleGraph/pipeline.xml</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">runPipeline</span>(simpleGraph)</code></pre>
+                            <span class="kw">file.path</span>(<span class="st">&quot;simpleGraph&quot;</span>, <span class="st">&quot;pipeline.xml&quot;</span>))
+<span class="kw">runPipeline</span>(simpleGraph)</code></pre>
 <h4 id="runcomponent"><code>runComponent()</code></h4>
 <p>Individual components in a pipeline can be executed using the <code>runComponent()</code> function. This can be useful for testing a pipeline. This function requires two arguments:</p>
 <ul>
@@ -473,30 +471,25 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 </ul>
 <pre><code>## rentalListings &lt;- read.csv(rentalListings.csv, header = TRUE)
 ## suburbIDs &lt;- read.csv(suburbIDs.csv, header = TRUE, stringsAsFactors = FALSE)
-##  
-## rentalListings$suburb &lt;- as.factor(rentalListings$suburb)
-## subIDs &lt;- levels(rentalListings$suburb)
-## subNames &lt;- sapply(subIDs, function(subID) suburbIDs[subID == suburbIDs[,1],2])
-## levels(rentalListings$suburb) &lt;- subNames</code></pre>
+## 
+## namedListings &lt;- merge(x = rentalListings, y = suburbIDs,
+##                        by.x = &quot;suburb&quot;, by.y = &quot;subIDs&quot;)</code></pre>
 <ul>
 <li><a href="aucklandRents/src/chooseSuburbs.R">chooseSuburbs.R</a>:</li>
 </ul>
-<pre><code>## inKingsland &lt;- rentalListings$suburb == &quot;Kingsland&quot;
-## inGreyLynn &lt;- rentalListings$suburb == &quot;Grey Lynn&quot;
-## inPonsonby &lt;- rentalListings$suburb == &quot;Ponsonby&quot;
+<pre><code>## ofInterest &lt;-
+##     namedListings$subNames %in% c(&quot;Kingsland&quot;, &quot;Grey Lynn&quot;, &quot;Ponsonby&quot;)
 ## 
-## ofInterest &lt;- inKingsland | inGreyLynn | inPonsonby
-## 
-## rentalListings &lt;- rentalListings[ofInterest,]
-## rentalListings$suburb &lt;- factor(rentalListings$suburb)</code></pre>
+## shortListings &lt;- namedListings[ofInterest,]
+## shortListings$subNames &lt;- factor(shortListings$subNames)</code></pre>
 <ul>
 <li><a href="aucklandRents/src/boxplotBySuburb.R">boxplotBySuburb.R</a>:</li>
 </ul>
 <pre><code>## svg(&quot;boxplot-rentBySuburb.svg&quot;)
-## boxplot(rentalListings$rent ~ rentalListings$suburb, xlab = &quot;Suburb&quot;,
+## boxplot(listings$rent ~ listings$subNames, xlab = &quot;Suburb&quot;,
 ##         ylab = &quot;Rent per week ($)&quot;, main=&quot;Rental prices in Auckland&quot;)
 ## dev.off()</code></pre>
-<p>R users will notice that the first script calls for files <code>rentalListings.csv</code> and <code>suburbIDs.csv</code> but that no such objects have been created. These object will be named as an inputs for this module, and will be made available to the module's R script by the glue system. Similarly the data frame <code>rentalListings</code> will be named as an input for the second module.</p>
+<p>R users will notice that the first script calls for files <code>rentalListings.csv</code> and <code>suburbIDs.csv</code> but that no such objects have been created. These object will be named as an inputs for this module, and will be made available to the module's R script by the glue system. Similarly the data frame <code>namedListings</code> will be named as an input for the second module, and <code>listings</code> as an input for the last module.</p>
 <h3 id="getting-data-into-conduit-rentallistings-and-suburbids">Getting data into conduit: <code>rentalListings</code> and <code>suburbIDs</code></h3>
 <p>This module needs to read data from two CSV files, <a href="aucklandRents/data/rentalListings.csv">rentalListings.csv</a> and <a href="aucklandRents/data/suburbIDs.csv">suburbIDs.csv</a>. For each CSV file we will create a dummy module which provides the file as an external output.</p>
 <p>The <code>rentalListings</code> module will have one output, our first CSV file. External outputs for dummy modules require an absolute file path for <code>ref</code>:</p>
@@ -524,12 +517,12 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
     <span class="kw">moduleInput</span>(<span class="dt">name =</span> <span class="st">&quot;rentalListings.csv&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;external&quot;</span>, 
                 <span class="dt">format =</span> <span class="st">&quot;CSV file&quot;</span>),
     <span class="kw">moduleInput</span>(<span class="st">&quot;suburbIDs.csv&quot;</span>, <span class="st">&quot;external&quot;</span>, <span class="st">&quot;CSV file&quot;</span>))</code></pre>
-<p>This module also has one source script, from the file <a href="aucklandRent/src/nameSuburbs.R">nameSuburbs.R</a>:</p>
+<p>This module also has one source script, from the file <a href="aucklandRents/src/nameSuburbs.R">nameSuburbs.R</a>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">nameSuburbsSource &lt;-<span class="st"> </span><span class="kw">moduleSource</span>(<span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;aucklandRents&quot;</span>, <span class="st">&quot;src&quot;</span>,
                                                   <span class="st">&quot;nameSuburbs.R&quot;</span>))</code></pre>
-<p>The source script creates an 'R data frame' object, <code>rentalListings</code>, which we will name as an internal output:</p>
+<p>The source script creates an 'R data frame' object, <code>namedListings</code>, which we will name as an internal output:</p>
 <pre class="sourceCode r"><code class="sourceCode r">nameSuburbsOutput &lt;-<span class="st"> </span>
-<span class="st">    </span><span class="kw">moduleOutput</span>(<span class="st">&quot;rentalListings&quot;</span>, <span class="st">&quot;internal&quot;</span>, <span class="st">&quot;R data frame&quot;</span>)</code></pre>
+<span class="st">    </span><span class="kw">moduleOutput</span>(<span class="st">&quot;namedListings&quot;</span>, <span class="st">&quot;internal&quot;</span>, <span class="st">&quot;R data frame&quot;</span>)</code></pre>
 <p>Now we can create a module object, <code>nameSuburbs</code>, with the name &quot;nameSuburbs&quot;, a description, and the inputs, source and output created above:</p>
 <pre class="sourceCode r"><code class="sourceCode r">nameSuburbs &lt;-
 <span class="st">    </span><span class="kw">module</span>(<span class="dt">name =</span> <span class="st">&quot;nameSuburbs&quot;</span>, <span class="dt">platform =</span> <span class="st">&quot;R&quot;</span>,
@@ -538,17 +531,17 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
            <span class="dt">sources =</span> <span class="kw">list</span>(nameSuburbsSource),
            <span class="dt">outputs =</span> <span class="kw">list</span>(nameSuburbsOutput))</code></pre>
 <h3 id="the-choosesuburbs-module">The <code>chooseSuburbs</code> module</h3>
-<p>This module has one input, an 'R data frame' <code>rentalListings</code>, and one source from the file <a href="aucklandRents/src/chooseSuburbs.R">chooseSuburbs.R</a>. This source replaces the <code>rentalListings</code> object with a smaller data frame of rental listing from three specific suburbs. We will name <code>rentalListings</code> as an internal output:</p>
+<p>This module has one input, an 'R data frame' <code>namedListings</code>, and one source from the file <a href="aucklandRents/src/chooseSuburbs.R">chooseSuburbs.R</a>. This source produce an 'R data frame' <code>shortListings</code>, a smaller data frame of rental listings from three specific suburbs. We will name <code>shortListings</code> as an internal output:</p>
 <pre class="sourceCode r"><code class="sourceCode r">chooseSuburbs &lt;-
 <span class="st">    </span><span class="kw">module</span>(<span class="dt">name =</span> <span class="st">&quot;chooseSuburbs&quot;</span>, <span class="dt">platform =</span> <span class="st">&quot;R&quot;</span>,
            <span class="dt">description =</span> <span class="st">&quot;produces a data frame of rent prices for the named suburbs&quot;</span>,
            <span class="dt">inputs =</span> <span class="kw">list</span>(
-               <span class="kw">moduleInput</span>(<span class="st">&quot;rentalListings&quot;</span>, <span class="st">&quot;internal&quot;</span>, <span class="st">&quot;R data frame&quot;</span>)),
+               <span class="kw">moduleInput</span>(<span class="st">&quot;namedListings&quot;</span>, <span class="st">&quot;internal&quot;</span>, <span class="st">&quot;R data frame&quot;</span>)),
            <span class="dt">sources =</span> <span class="kw">list</span>(
                <span class="kw">moduleSource</span>(<span class="dt">ref =</span> <span class="kw">file.path</span>(<span class="st">&quot;aucklandRents&quot;</span>, <span class="st">&quot;src&quot;</span>, 
                                             <span class="st">&quot;chooseSuburbs.R&quot;</span>))),
            <span class="dt">outputs =</span> <span class="kw">list</span>(
-               <span class="kw">moduleOutput</span>(<span class="st">&quot;rentalListings&quot;</span>, <span class="st">&quot;internal&quot;</span>, <span class="st">&quot;R data frame&quot;</span>)))</code></pre>
+               <span class="kw">moduleOutput</span>(<span class="st">&quot;shortListings&quot;</span>, <span class="st">&quot;internal&quot;</span>, <span class="st">&quot;R data frame&quot;</span>)))</code></pre>
 <h3 id="the-last-module-boxplotbysuburb">The last module: <code>boxplotBySuburb</code></h3>
 <p>The final script creates an SVG file, named &quot;boxplot-rentBySuburb.svg&quot;, in the current working directory. We will create an external output for this module, named &quot;boxplot-rentBySuburb.svg&quot;, and record the filename as the output's <code>ref</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">boxplotBySuburbOutput &lt;-<span class="st"> </span>
@@ -556,11 +549,11 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
                  <span class="dt">type =</span> <span class="st">&quot;external&quot;</span>,
                  <span class="dt">ref =</span> <span class="st">&quot;boxplot-rentBySuburb.svg&quot;</span>,
                  <span class="dt">format =</span> <span class="st">&quot;SVG image file&quot;</span>)</code></pre>
-<p>This module has one source script, from the file <a href="aucklandRents/src/boxplotBySuburb.R">boxplotBySuburb.R</a>. This script requires an &quot;R data frame&quot; object, <code>rentalListings</code>. We create the module <code>plotGraph</code> with the following code:</p>
+<p>This module has one source script, from the file <a href="aucklandRents/src/boxplotBySuburb.R">boxplotBySuburb.R</a>. This script requires an &quot;R data frame&quot; object, <code>listings</code>. We create the module <code>boxplotBySuburb</code> with the following code:</p>
 <pre class="sourceCode r"><code class="sourceCode r">boxplotBySuburb &lt;-
 <span class="st">    </span><span class="kw">module</span>(<span class="st">&quot;boxplotBySuburb&quot;</span>, <span class="dt">platform=</span><span class="st">&quot;R&quot;</span>,
            <span class="dt">inputs=</span><span class="kw">list</span>(
-               <span class="kw">moduleInput</span>(<span class="st">&quot;rentalListings&quot;</span>, <span class="st">&quot;internal&quot;</span>, <span class="st">&quot;R data frame&quot;</span>)),
+               <span class="kw">moduleInput</span>(<span class="st">&quot;listings&quot;</span>, <span class="st">&quot;internal&quot;</span>, <span class="st">&quot;R data frame&quot;</span>)),
            <span class="dt">sources=</span><span class="kw">list</span>(
                <span class="kw">moduleSource</span>(
                    <span class="dt">ref=</span><span class="kw">file.path</span>(<span class="st">&quot;aucklandRents&quot;</span>, <span class="st">&quot;src&quot;</span>, 
@@ -574,11 +567,11 @@ pipelineExample &lt;-<span class="st"> </span><span class="kw">addPipe</span>(pi
 <p>Similarly, we need a pipe connecting &quot;suburbIDs.csv&quot; from <code>suburbIDs</code> to &quot;suburbIDs.csv&quot; in <code>nameSuburbs</code>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">pipe2 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="st">&quot;suburbIDs&quot;</span>, <span class="st">&quot;suburbIDs.csv&quot;</span>,
               <span class="st">&quot;nameSuburbs&quot;</span>, <span class="st">&quot;suburbIDs.csv&quot;</span>)</code></pre>
-<p>Two more pipes are required, connecting &quot;rentalListings&quot; from <code>nameSuburbs</code> to &quot;rentalListings&quot; in <code>chooseSuburbs</code>, connection &quot;rentalListings&quot; from <code>chooseSuburbs</code> to &quot;rentalListings&quot; in <code>boxplotBySuburbs</code>.</p>
-<pre class="sourceCode r"><code class="sourceCode r">pipe3 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="st">&quot;nameSuburbs&quot;</span>, <span class="st">&quot;rentalListings&quot;</span>,
-              <span class="st">&quot;chooseSuburbs&quot;</span>, <span class="st">&quot;rentalListings&quot;</span>)
-pipe4 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="st">&quot;chooseSuburbs&quot;</span>, <span class="st">&quot;rentalListings&quot;</span>,
-              <span class="st">&quot;boxplotBySuburb&quot;</span>, <span class="st">&quot;rentalListings&quot;</span>)</code></pre>
+<p>Two more pipes are required, connecting &quot;namedListings&quot; from <code>nameSuburbs</code> to &quot;namedListings&quot; in <code>chooseSuburbs</code>, and connecting &quot;shortListings&quot; from <code>chooseSuburbs</code> to &quot;listings&quot; in <code>boxplotBySuburbs</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">pipe3 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="st">&quot;nameSuburbs&quot;</span>, <span class="st">&quot;namedListings&quot;</span>,
+              <span class="st">&quot;chooseSuburbs&quot;</span>, <span class="st">&quot;namedListings&quot;</span>)
+pipe4 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="st">&quot;chooseSuburbs&quot;</span>, <span class="st">&quot;shortListings&quot;</span>,
+              <span class="st">&quot;boxplotBySuburb&quot;</span>, <span class="st">&quot;listings&quot;</span>)</code></pre>
 <h3 id="creating-the-aucklandrents-pipeline">Creating the <code>aucklandRents</code> pipeline</h3>
 <p>We now have all the necessary pieces to create our <code>aucklandRents</code> pipeline. We have our list of components:</p>
 <pre class="sourceCode r"><code class="sourceCode r">componentsList &lt;-<span class="st"> </span><span class="kw">list</span>(rentalListings, suburbIDs, nameSuburbs,
@@ -597,9 +590,9 @@ pipe4 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="st
 <ol style="list-style-type: decimal">
 <li><a href="pipelines/aucklandRents/modules/boxplotBySuburb/boxplot-rentBySuburb.svg" class="uri">pipelines/aucklandRents/modules/boxplotBySuburb/boxplot-rentBySuburb.svg</a></li>
 <li><a href="pipelines/aucklandRents/modules/boxplotBySuburb/script.R" class="uri">pipelines/aucklandRents/modules/boxplotBySuburb/script.R</a></li>
-<li><a href="pipelines/aucklandRents/modules/chooseSuburbs/rentalListings.rds" class="uri">pipelines/aucklandRents/modules/chooseSuburbs/rentalListings.rds</a></li>
 <li><a href="pipelines/aucklandRents/modules/chooseSuburbs/script.R" class="uri">pipelines/aucklandRents/modules/chooseSuburbs/script.R</a></li>
-<li><a href="pipelines/aucklandRents/modules/nameSuburbs/rentalListings.rds" class="uri">pipelines/aucklandRents/modules/nameSuburbs/rentalListings.rds</a></li>
+<li><a href="pipelines/aucklandRents/modules/chooseSuburbs/shortListings.rds" class="uri">pipelines/aucklandRents/modules/chooseSuburbs/shortListings.rds</a></li>
+<li><a href="pipelines/aucklandRents/modules/nameSuburbs/namedListings.rds" class="uri">pipelines/aucklandRents/modules/nameSuburbs/namedListings.rds</a></li>
 <li><a href="pipelines/aucklandRents/modules/nameSuburbs/script.R" class="uri">pipelines/aucklandRents/modules/nameSuburbs/script.R</a></li>
 <li><a href="pipelines/aucklandRents/modules/rentalListings/script.R" class="uri">pipelines/aucklandRents/modules/rentalListings/script.R</a></li>
 <li><a href="pipelines/aucklandRents/modules/suburbIDs/script.R" class="uri">pipelines/aucklandRents/modules/suburbIDs/script.R</a></li>
@@ -631,12 +624,12 @@ pipe4 &lt;-<span class="st"> </span><span class="kw">pipe</span>(<span class="st
 ##     &lt;end component=&quot;nameSuburbs&quot; input=&quot;suburbIDs.csv&quot;/&gt;
 ##   &lt;/pipe&gt;
 ##   &lt;pipe&gt;
-##     &lt;start component=&quot;nameSuburbs&quot; output=&quot;rentalListings&quot;/&gt;
-##     &lt;end component=&quot;chooseSuburbs&quot; input=&quot;rentalListings&quot;/&gt;
+##     &lt;start component=&quot;nameSuburbs&quot; output=&quot;namedListings&quot;/&gt;
+##     &lt;end component=&quot;chooseSuburbs&quot; input=&quot;namedListings&quot;/&gt;
 ##   &lt;/pipe&gt;
 ##   &lt;pipe&gt;
-##     &lt;start component=&quot;chooseSuburbs&quot; output=&quot;rentalListings&quot;/&gt;
-##     &lt;end component=&quot;boxplotBySuburb&quot; input=&quot;rentalListings&quot;/&gt;
+##     &lt;start component=&quot;chooseSuburbs&quot; output=&quot;shortListings&quot;/&gt;
+##     &lt;end component=&quot;boxplotBySuburb&quot; input=&quot;listings&quot;/&gt;
 ##   &lt;/pipe&gt;
 ## &lt;/pipeline&gt;</code></pre>
 <p>The component XML files can be seen at:</p>
